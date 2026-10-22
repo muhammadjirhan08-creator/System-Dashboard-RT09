@@ -71,6 +71,7 @@ function login() {
     { username: 'kader09@rt09karangrejo.co.id', password: 'saikem123', nama: 'Saikem' },
     { username: 'bendahara09@rt09karangrejo.co.id', password: 'sri123', nama: 'Sri Ubayati' },
     { username: 'muhammadjirhan@rt09karangrejo.co.id', password: 'jirhan123', nama: 'Muhammad Jirhan' },
+    { username: 'sekretaris09@rt09karangrejo.co.id', password: 'widodo123', nama: 'Widodo' },
     { username: 'admin', password: 'admin123', nama: 'Admin RT' }
   ];
 
