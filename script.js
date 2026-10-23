@@ -297,27 +297,35 @@ function exportExcel() {
   if (dataWarga.length === 0) return alert('Tidak ada data untuk diexport.');
   let tableHTML = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>ID</th><th>Nama</th><th>NIK</th><th>No. KK</th><th>Jenis Kelamin</th><th>Pekerjaan</th><th>Alamat</th><th>Status</th></tr></thead><tbody>`;
   dataWarga.forEach((w, index) => {
-    tableHTML += `<tr><td>${index + 1}</td><td>${w.nama || '-'}</td><td>${w.nik || '-'}</td><td>${w.noKK || '-'}</td><td>${w.jk || '-'}</td><td>${w.pekerjaan || '-'}</td><td>${w.alamat || '-'}</td><td>${w.status || '-'}</td></tr>`;
+    // LOGIKA PERUBAHAN JENIS KELAMIN
+    let jenisKelaminLengkap = '-';
+    if (w.jk === 'L') jenisKelaminLengkap = 'Laki-laki';
+    if (w.jk === 'P') jenisKelaminLengkap = 'Perempuan';
+
+    tableHTML += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${w.nama || '-'}</td>
+        <td>${w.nik || '-'}</td>
+        <td>${w.noKK || '-'}</td>
+        <td>${jenisKelaminLengkap}</td> <!-- Menggunakan variabel yang sudah diubah -->
+        <td>${w.pekerjaan || '-'}</td>
+        <td>${w.alamat || '-'}</td>
+        <td>${w.status || '-'}</td>
+      </tr>
+    `;
   });
+
   tableHTML += `</tbody></table></body></html>`;
+
   const blob = new Blob([tableHTML], { type: 'application/vnd.ms-excel' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = `Data_Warga_RT09_${new Date().toLocaleDateString('id-ID').replace(/\//g, '-')}.xls`;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-}
-
-function downloadTemplate() {
-  const headers = ["Nama Lengkap", "NIK", "No KK", "Jenis Kelamin (L/P)", "Pekerjaan", "Alamat Lengkap", "Status (Tetap/Kontrak)"];
-  const csvString = headers.join(',') + "\nBudi Santoso,3201234567890001,6471012345670001,L,Karyawan Swasta,Jl. Melati No.1,Tetap";
-  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'Template_Import_Warga.csv'; a.click();
-}
-
-function openModalImport() {
-  alert("Fitur Import sedang dalam pengembangan.");
+  a.href = url;
+  a.download = `Data_Warga_RT09_${new Date().toLocaleDateString('id-ID').replace(/\//g, '-')}.xls`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 // =======================================================
