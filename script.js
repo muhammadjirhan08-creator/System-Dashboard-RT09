@@ -282,8 +282,8 @@ function renderTable() {
 async function simpanWarga() {
   const nama = document.getElementById('w-nama').value.trim(); 
   const nik = document.getElementById('w-nik').value.trim(); 
-  const noKtp = document.getElementById('w-kk').value.trim(); // Sesuaikan ID jika berbeda
-  const jk = document.getElementById('w-jk').value;
+  const noKtp = document.getElementById('w-kk').value.trim(); // Sesuaikan ID form Anda
+  const jk = document.getElementById('w-jk').value; // Pastikan ID form untuk jenis kelamin adalah 'w-jk'
   const pekerjaan = document.getElementById('w-pekerjaan').value.trim();
   const alamat = document.getElementById('w-alamat').value.trim();
   const status = document.getElementById('w-status').value;
@@ -291,7 +291,7 @@ async function simpanWarga() {
   if (!nama || !nik || !alamat) return alert('Lengkapi data wajib (Nama, NIK, dan Alamat)!');
 
   try {
-    // Simpan ke Firebase (semua data dimasukkan)
+    // Simpan ke Firebase dengan properti yang sesuai
     await window.fbAddDoc(window.fbCollection(window.firebaseDB, "warga"), {
       nama: nama,
       nik: nik,
