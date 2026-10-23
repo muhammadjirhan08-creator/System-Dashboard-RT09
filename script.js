@@ -159,26 +159,28 @@ function renderWarga() {
       return;
     }
 
-    let index = 1;
+   let index = 1;
     snapshot.forEach((doc) => {
       const w = doc.data();
       dataWarga.push(w);
 
+      // Urutan <td> disesuaikan dengan urutan <th> di HTML
       tbody.innerHTML += `
         <tr>
           <td>${index++}</td>
-          <td>${w.nama}</td>
-          <td>${w.nik || '-'}</td>
-          <td>${w.kk}</td>
-          <td>${w.alamat}</td>
-          <td><span class="badge ${w.status === 'Tetap' ? 'badge-success' : 'badge-danger'}">${w.status}</span></td>
           <td>
             <button class="btn-secondary" onclick="hapusWarga('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;"><i class="fas fa-trash"></i></button>
           </td>
+          <td>${w.nama || '-'}</td>
+          <td>${w.nik || '-'}</td>
+          <td>${w.noKtp || '-'}</td>
+          <td>${w.jk || '-'}</td>
+          <td>${w.pekerjaan || '-'}</td>
+          <td>${w.alamat || '-'}</td>
+          <td><span class="badge ${w.status === 'Tetap' ? 'badge-success' : 'badge-danger'}">${w.status || '-'}</span></td>
         </tr>`;
     });
     
-    // Update angka total warga di Dashboard
     const elTotalWarga = document.getElementById('total-warga');
     if (elTotalWarga) elTotalWarga.textContent = dataWarga.length;
   });
