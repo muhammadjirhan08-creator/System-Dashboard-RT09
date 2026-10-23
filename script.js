@@ -1,6 +1,19 @@
 // =======================================================
-// 1. LOGIKA LOGIN & EVENT LISTENER
+// 1. EVENT LISTENER (SHORTCUT & LOGIN CHECK)
 // =======================================================
+
+// Ini untuk Shortcut Ctrl + H dan ESC
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'h') {
+    e.preventDefault(); 
+    bukaPencarian(); 
+  }
+  if (e.key === 'Escape') {
+    closeModal('modal-pencarian');
+  }
+});
+
+// Ini untuk cek login saat halaman dimuat
 document.addEventListener('DOMContentLoaded', () => {
   const isLoggedIn = sessionStorage.getItem('isLoggedIn');
   if (isLoggedIn === 'true') {

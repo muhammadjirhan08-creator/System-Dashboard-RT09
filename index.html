@@ -81,9 +81,9 @@
         <div class="user-info" style="display: flex; align-items: center; gap: 15px;">
           
           <!-- Kotak Pencarian -->
-          <div class="search-box" style="margin-right: 0; width: 200px;">
-            <i class="fas fa-search"></i>
-            <input type="text" id="search-menu" placeholder="Cari menu... (Ctrl+H)" onkeyup="cariMenu()">
+  <div class="search-box" style="margin-right: 15px; cursor: pointer;" onclick="bukaPencarian()">
+  <i class="fas fa-search"></i>
+  <input type="text" id="search-menu" placeholder="Cari menu... (Ctrl+H)" readonly style="cursor: pointer;">
           </div>
 
           <!-- Jam Digital -->
@@ -502,6 +502,17 @@
       </button>
       <!-- Gambar Poster Full -->
       <img id="poster-full" src="" alt="Poster Full" style="max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+    </div>
+  </div>
+<!-- ================= MODAL PENCARIAN GLOBAL ================= -->
+  <div id="modal-pencarian" class="modal">
+    <div class="search-modal-content">
+      <div class="search-header">
+        <i class="fas fa-search" style="color: #94a3b8; font-size: 18px;"></i>
+        <input type="text" id="input-pencarian" placeholder="Cari menu..." onkeyup="jalankanPencarian()" autocomplete="off">
+        <button onclick="closeModal('modal-pencarian')" class="search-esc-btn">ESC</button>
+      </div>
+      <div id="hasil-pencarian" class="search-results"></div>
     </div>
   </div>
 
