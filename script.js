@@ -367,13 +367,30 @@ async function simpanKK() {
   const kepala = document.getElementById('kk-kepala').value.trim();
   const jumlah = document.getElementById('kk-jumlah').value.trim();
   const alamat = document.getElementById('kk-alamat').value.trim();
-  if (!nomor || !kepala || !alamat) return alert('Lengkapi data KK!');
+  
+  if (!nomor || !kepala || !alamat) {
+    return alert('Lengkapi data KK (Nomor, Kepala, dan Alamat)!');
+  }
+
   try {
-    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "kk"), { nomor, kepala, jumlah, alamat });
+    // Simpan ke Firebase
+    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "kk"), { 
+      nomor, kepala, jumlah, alamat 
+    });
+    
     alert('Data KK berhasil ditambahkan!');
     closeModal('modal-kk');
-    document.getElementById('kk-nomor').value = ''; document.getElementById('kk-kepala').value = ''; document.getElementById('kk-jumlah').value = ''; document.getElementById('kk-alamat').value = '';
-  } catch (error) { console.error("Error: ", error); }
+    
+    // Kosongkan form setelah disimpan
+    document.getElementById('kk-nomor').value = '';
+    document.getElementById('kk-kepala').value = '';
+    document.getElementById('kk-jumlah').value = '';
+    document.getElementById('kk-alamat').value = '';
+    
+  } catch (error) {
+    console.error("Error simpan KK: ", error);
+    alert('Gagal menyimpan data KK. Periksa koneksi internet.');
+  }
 }
 
 async function openEditKK(idDokumen) {
