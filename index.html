@@ -441,8 +441,14 @@
   <div id="modal-iuran" class="modal">
     <div class="modal-content">
       <h3>Catat Iuran</h3>
+      
+      <label>Nama Warga</label>
       <input type="text" id="i-nama" placeholder="Nama warga">
-      <input type="text" id="i-bulan" placeholder="Bulan (contoh: Januari 2025)">
+      
+      <label>Bulan</label>
+      <input type="text" id="i-bulan" placeholder="Bulan (contoh: Januari 2026)">
+      
+      <label>Jumlah</label>
       <input type="number" id="i-jumlah" placeholder="Jumlah (Rp)">
       <div class="modal-actions">
         <button class="btn-secondary" onclick="closeModal('modal-iuran')">Batal</button>
@@ -455,7 +461,10 @@
   <div id="modal-pengumuman" class="modal">
     <div class="modal-content">
       <h3>Buat Pengumuman</h3>
+      
+      <label>Judul</label>
       <input type="text" id="p-judul" placeholder="Judul">
+      <label>Isi Pengumuman</label>
       <textarea id="p-isi" placeholder="Isi pengumuman" rows="4"></textarea>
       <div class="modal-actions">
         <button class="btn-secondary" onclick="closeModal('modal-pengumuman')">Batal</button>
