@@ -265,7 +265,6 @@ button.btn-login:hover {
   border-bottom: 1px solid #e2e8f0;
   vertical-align: middle; /* Agar teks sejajar ke tengah secara vertikal */
 }
-}
 .table th { background: #f8fafc; color: #475569; font-weight: 600; }
 .table tr:hover { background: #f8fafc; }
 
