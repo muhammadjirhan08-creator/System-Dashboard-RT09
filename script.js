@@ -515,34 +515,27 @@ function hapusIuran(index) {
 // =======================================================
 function renderPengumuman() {
   const list = document.getElementById('list-pengumuman');
-  if(list) {
-    list.innerHTML = '';
-    if (dataPengumuman.length === 0) list.innerHTML = '<p style="color:#64748b">Belum ada pengumuman.</p>';
-    else {
-      dataPengumuman.forEach((p, index) => {
-        list.innerHTML += `
-          <div class="pengumuman-item" style="position: relative;">
-            <h4>${p.judul}</h4><p>${p.isi}</p><small>📅 ${p.tanggal}</small>
-            <button class="btn-secondary" onclick="hapusPengumuman(${index})" style="position: absolute; top: 15px; right: 15px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;"><i class="fas fa-trash"></i></button>
-          </div>`;
-      });
-    }
-  }
+  if(!list) return;
 
-  const homeList = document.getElementById('home-list-pengumuman');
-  if (homeList) {
-    homeList.innerHTML = ''; 
-    if (dataPengumuman.length === 0) homeList.innerHTML = '<p style="color:#64748b; font-size:13px;">Belum ada pengumuman terbaru.</p>';
-    else {
-      dataPengumuman.slice(0, 3).forEach(p => {
-        homeList.innerHTML += `
-          <div class="list-item">
-            <div class="list-icon green"><i class="fas fa-bullhorn"></i></div>
-            <div class="list-content"><h4>${p.judul}</h4><p>${p.isi}</p><small>📅 ${p.tanggal}</small></div>
-          </div>`;
-      });
+  window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengumuman"), (snapshot) => {
+    list.innerHTML = '';
+    
+    if (snapshot.empty) {
+      list.innerHTML = '<p style="color:#64748b">Belum ada pengumuman.</p>';
+      return;
     }
-  }
+
+    snapshot.forEach((doc) => {
+      const p = doc.data();
+      list.innerHTML += `
+        <div class="pengumuman-item" style="position: relative;">
+          <h4>${p.judul}</h4>
+          <p>${p.isi}</p>
+          <small>📅 ${p.tanggal}</small>
+          <button class="btn-secondary" onclick="hapusPengumuman('${doc.id}')" style="position: absolute; top: 15px; right: 15px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;"><i class="fas fa-trash"></i></button>
+        </div>`;
+    });
+  });
 }
 
 function simpanPengumuman() {
@@ -563,23 +556,48 @@ function hapusPengumuman(index) {
 // 11. CHART / GRAFIK
 // =======================================================
 function renderCharts() {
+  // Hancurkan grafik lama jika sudah ada
+  if (window.myChartIuran) {
+    window.myChartIuran.destroy();
+  }
+  if (window.myChartWarga) {
+    window.myChartWarga.destroy();
+  }
+
   const chartIuranEl = document.getElementById('chartIuran');
   if(chartIuranEl) {
-    new Chart(chartIuranEl, {
+    window.myChartIuran = new Chart(chartIuranEl, {
       type: 'bar',
-      data: { labels: ['Agu', 'Sep', 'Okt', 'Nov', 'Des', 'Jan'], datasets: [{ label: 'Iuran (Rp)', data: [450000, 500000, 480000, 520000, 550000, 500000], backgroundColor: '#3b82f6', borderRadius: 6 }] },
+      data: {
+        labels: ['Agu', 'Sep', 'Okt', 'Nov', 'Des', 'Jan'],
+        datasets: [{
+          label: 'Iuran (Rp)',
+          data: [450000, 500000, 480000, 520000, 550000, 500000],
+          backgroundColor: '#3b82f6',
+          borderRadius: 6
+        }]
+      },
       options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
     });
   }
+
   const chartWargaEl = document.getElementById('chartWarga');
   if(chartWargaEl) {
-    new Chart(chartWargaEl, {
+    window.myChartWarga = new Chart(chartWargaEl, {
       type: 'doughnut',
-      data: { labels: ['Tetap', 'Kontrak'], datasets: [{ data: [dataWarga.filter(w => w.status === 'Tetap').length, dataWarga.filter(w => w.status === 'Kontrak').length], backgroundColor: ['#10b981', '#f59e0b'] }] }
+      data: {
+        labels: ['Tetap', 'Kontrak'],
+        datasets: [{
+          data: [
+            dataWarga.filter(w => w.status === 'Tetap').length,
+            dataWarga.filter(w => w.status === 'Kontrak').length
+          ],
+          backgroundColor: ['#10b981', '#f59e0b']
+        }]
+      }
     });
   }
 }
-
 // =======================================================
 // 12. SURAT PENGANTAR
 // =======================================================
