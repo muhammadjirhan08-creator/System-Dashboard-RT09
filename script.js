@@ -138,7 +138,12 @@ function showDashboard() {
     sidebarMenus.forEach(menu => menu.style.display = 'flex');
   }
 
-  renderWarga(); renderKK(); renderIuran(); renderPengumuman(); renderCharts(); renderHomeSurat();
+  renderWarga(); 
+  renderKK(); 
+  renderIuran(); 
+  renderPengumuman(); 
+  renderCharts();
+  renderHomeSurat();
   
   const homeMenu = document.querySelector('[data-page="home"]');
   if(homeMenu) homeMenu.click();
@@ -173,7 +178,7 @@ function renderWarga() {
     let index = 1;
     snapshot.forEach((doc) => {
       const w = doc.data();
-      w.id = doc.id; // Simpan ID Firebase
+      w.id = doc.id; 
       dataWarga.push(w);
 
       tbody.innerHTML += `
