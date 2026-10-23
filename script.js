@@ -179,7 +179,7 @@ function renderWarga() {
           </td>
           <td>${w.nama || '-'}</td>
           <td>${w.nik || '-'}</td>
-          <td>${w.noKtp || '-'}</td>
+          <td>${w.noKK || '-'}</td>
           <td>${w.jk === 'L' ? 'Laki-laki' : (w.jk === 'P' ? 'Perempuan' : '-')}</td>
           <td>${w.pekerjaan || '-'}</td>
           <td>${w.alamat || '-'}</td>
@@ -269,8 +269,8 @@ function renderTable() {
         </td>
         <td>${w.nama}</td>
         <td>${w.nik || '-'}</td>
-        <!-- Pastikan menggunakan w.noKtp sesuai standar tabel baru -->
-        <td>${w.noKtp || '-'}</td>
+        <!-- Pastikan menggunakan w.noKK sesuai standar tabel baru -->
+        <td>${w.noKK || '-'}</td>
         <td>${w.jk === 'L' ? 'Laki-laki' : 'Perempuan'}</td>
         <td>${w.pekerjaan || '-'}</td>
         <td>${w.alamat}</td>
@@ -288,7 +288,7 @@ function renderTable() {
 async function simpanWarga() {
   const nama = document.getElementById('w-nama').value.trim(); 
   const nik = document.getElementById('w-nik').value.trim(); 
-  const noKtp = document.getElementById('w-kk').value.trim(); // Sesuaikan ID form Anda
+  const noKK = document.getElementById('w-kk').value.trim(); // Sesuaikan ID form Anda
   const jk = document.getElementById('w-jk').value; // Pastikan ID form untuk jenis kelamin adalah 'w-jk'
   const pekerjaan = document.getElementById('w-pekerjaan').value.trim();
   const alamat = document.getElementById('w-alamat').value.trim();
@@ -298,10 +298,10 @@ async function simpanWarga() {
 
   try {
     // Simpan ke Firebase dengan properti yang sesuai
-    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "warga"), {
+     await window.fbAddDoc(window.fbCollection(window.firebaseDB, "warga"), {
       nama: nama,
       nik: nik,
-      noKtp: noKtp,
+      noKtp: noKK, // Sesuaikan dengan form ID 'w-kk'
       jk: jk,
       pekerjaan: pekerjaan,
       alamat: alamat,
@@ -336,8 +336,8 @@ function openEditWarga(id) {
   document.getElementById('edit-w-id').value = dataWarga[index].id;
   document.getElementById('edit-w-nama').value = dataWarga[index].nama;
   document.getElementById('edit-w-nik').value = dataWarga[index].nik || '';       
-  // PERBAIKAN: Gunakan properti noKtp dan pasangkan ke input edit-w-kk
-  document.getElementById('edit-w-kk').value = dataWarga[index].noKtp || '';      
+  // PERBAIKAN: Gunakan properti noKK dan pasangkan ke input edit-w-kk
+  document.getElementById('edit-w-kk').value = dataWarga[index].noKK || '';      
   document.getElementById('edit-w-jk').value = dataWarga[index].jk || 'L';
   document.getElementById('edit-w-pekerjaan').value = dataWarga[index].pekerjaan || '';
   document.getElementById('edit-w-alamat').value = dataWarga[index].alamat;
@@ -355,8 +355,8 @@ function simpanEditWarga() {
 
   dataWarga[index].nama = document.getElementById('edit-w-nama').value;
   dataWarga[index].nik = document.getElementById('edit-w-nik').value;
-  // PERBAIKAN: Simpan ke properti noKtp
-  dataWarga[index].noKtp = document.getElementById('edit-w-kk').value;
+  // PERBAIKAN: Simpan ke properti noKK
+  dataWarga[index].noKK = document.getElementById('edit-w-kk').value;
   dataWarga[index].jk = document.getElementById('edit-w-jk').value;
   dataWarga[index].pekerjaan = document.getElementById('edit-w-pekerjaan').value;
   dataWarga[index].alamat = document.getElementById('edit-w-alamat').value;
@@ -380,7 +380,7 @@ function hapusWarga(id) {
 function lihatWarga(id) {
   const w = dataWarga.find(item => item.id == id);
   if(w) {
-    alert(`Detail Warga:\nNama: ${w.nama}\nNIK: ${w.nik}\nNo KTP: ${w.noKtp}\nPekerjaan: ${w.pekerjaan}\nAlamat: ${w.alamat}`);
+    alert(`Detail Warga:\nNama: ${w.nama}\nNIK: ${w.nik}\nNo KK: ${w.noKK}\nPekerjaan: ${w.pekerjaan}\nAlamat: ${w.alamat}`);
   }
 }
 
@@ -393,7 +393,7 @@ function exportData() {
         return;
     }
     
-    const headers = ["ID", "Nama", "NIK", "No KTP", "Jenis Kelamin", "Pekerjaan", "Alamat", "Status"];
+    const headers = ["ID", "Nama", "NIK", "No KK", "Jenis Kelamin", "Pekerjaan", "Alamat", "Status"];
     const csvRows = [];
     csvRows.push(headers.join(',')); 
     
@@ -402,7 +402,7 @@ function exportData() {
             w.id, 
             `"${w.nama}"`, 
             `"${w.nik}"`, 
-            `"${w.noKtp}"`, // Sesuaikan ke noKtp
+            `"${w.noKK}"`, // Sesuaikan ke noKK
             w.jk, 
             `"${w.pekerjaan}"`, 
             `"${w.alamat}"`, 
@@ -1060,7 +1060,7 @@ function exportData() {
 
 // 1. Fungsi Download Template
 function downloadTemplate() {
-    const headers = ["Nama Lengkap", "NIK", "No KTP", "Jenis Kelamin (L/P)", "Pekerjaan", "Alamat Lengkap", "Status (Tetap/Kontrak)"];
+    const headers = ["Nama Lengkap", "NIK", "No KK", "Jenis Kelamin (L/P)", "Pekerjaan", "Alamat Lengkap", "Status (Tetap/Kontrak)"];
     const csvRows = [];
     csvRows.push(headers.join(',')); 
     
@@ -1115,7 +1115,7 @@ function prosesImport() {
                     id: Date.now() + i, // ID Unik
                     nama: cols[0].replace(/"/g, '').trim(),                 // Kolom 1: Nama
                     nik: cols[1].replace(/"/g, '').trim(),                  // Kolom 2: NIK
-                    noKtp: cols[2].replace(/"/g, '').trim(),                // Kolom 3: No KTP
+                    noKK: cols[2].replace(/"/g, '').trim(),                // Kolom 3: No KK
                     jk: cols[3].trim().toUpperCase() === 'P' ? 'P' : 'L',   // Kolom 4: Jenis Kelamin
                     pekerjaan: cols[4].replace(/"/g, '').trim(),            // Kolom 5: Pekerjaan
                     alamat: cols[5].replace(/"/g, '').trim(),               // Kolom 6: Alamat
@@ -1224,7 +1224,7 @@ async function lihatWarga(idDokumen) {
       const w = docSnap.data();
       document.getElementById('lihat-nama').innerText = w.nama || '-';
       document.getElementById('lihat-nik').innerText = w.nik || '-';
-      document.getElementById('lihat-kk').innerText = w.noKtp || '-';
+      document.getElementById('lihat-kk').innerText = w.noKK || '-';
       document.getElementById('lihat-jk').innerText = w.jk === 'L' ? 'Laki-laki' : 'Perempuan';
       document.getElementById('lihat-pekerjaan').innerText = w.pekerjaan || '-';
       document.getElementById('lihat-alamat').innerText = w.alamat || '-';
@@ -1249,7 +1249,7 @@ async function openEditWarga(idDokumen) {
       document.getElementById('edit-w-id').value = idDokumen;
       document.getElementById('edit-w-nama').value = w.nama || '';
       document.getElementById('edit-w-nik').value = w.nik || '';
-      document.getElementById('edit-w-kk').value = w.noKtp || '';
+      document.getElementById('edit-w-kk').value = w.noKK || '';
       document.getElementById('edit-w-jk').value = w.jk || 'L';
       document.getElementById('edit-w-pekerjaan').value = w.pekerjaan || '';
       document.getElementById('edit-w-alamat').value = w.alamat || '';
@@ -1267,7 +1267,7 @@ async function simpanEditWarga() {
   const dataBaru = {
     nama: document.getElementById('edit-w-nama').value.trim(),
     nik: document.getElementById('edit-w-nik').value.trim(),
-    noKtp: document.getElementById('edit-w-kk').value.trim(),
+    noKK: document.getElementById('edit-w-kk').value.trim(),
     jk: document.getElementById('edit-w-jk').value,
     pekerjaan: document.getElementById('edit-w-pekerjaan').value.trim(),
     alamat: document.getElementById('edit-w-alamat').value.trim(),
@@ -1285,4 +1285,55 @@ async function simpanEditWarga() {
     console.error("Error update: ", error);
     alert('Gagal mengupdate data.');
   }
+}
+// ============ FUNGSI EXPORT EXCEL ============
+function exportExcel() {
+  // Pastikan dataWarga ada isinya
+  if (typeof dataWarga === 'undefined' || dataWarga.length === 0) {
+    return alert('Tidak ada data untuk diexport.');
+  }
+
+  let tableHTML = `
+    <table border="1">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nama</th>
+          <th>NIK</th>
+          <th>No. KK</th>
+          <th>Jenis Kelamin</th>
+          <th>Pekerjaan</th>
+          <th>Alamat</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  dataWarga.forEach((w, index) => {
+    tableHTML += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${w.nama || '-'}</td>
+        <td>${w.nik || '-'}</td>
+        <td>${w.noKK || '-'}</td>
+        <td>${w.jk || '-'}</td>
+        <td>${w.pekerjaan || '-'}</td>
+        <td>${w.alamat || '-'}</td>
+        <td>${w.status || '-'}</td>
+      </tr>
+    `;
+  });
+
+  tableHTML += `</tbody></table>`;
+
+  // Proses download file Excel
+  const blob = new Blob([tableHTML], { type: 'application/vnd.ms-excel' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Data_Warga_RT09_${new Date().toLocaleDateString('id-ID').replace(/\//g, '-')}.xls`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
