@@ -697,6 +697,7 @@ function lupaPassword() {
   alert("Untuk mereset password, silakan hubungi Admin System RT 09:\n\nNama: Muhammad Jirhan\nNo. HP/WA: 0812-5763-9264\n\nSebutkan nama dan alamat Anda untuk verifikasi.");
 }
 
+// Daftar Menu (Harus ada agar muncul di pop-up)
 const menuNavigasi = [
   { id: 'home', nama: 'Home', icon: 'fa-home', deskripsi: 'Halaman Utama' },
   { id: 'dashboard', nama: 'Dashboard', icon: 'fa-chart-line', deskripsi: 'Statistik & Grafik' },
@@ -708,28 +709,58 @@ const menuNavigasi = [
   { id: 'laporan', nama: 'Laporan', icon: 'fa-file-alt', deskripsi: 'Laporan Keuangan' }
 ];
 
+// Fungsi Buka Modal Pencarian
 function bukaPencarian() {
   document.getElementById('modal-pencarian').classList.add('active');
-  const input = document.getElementById('input-pencarian'); input.value = ''; input.focus();
-  tampilkanHasil(menuNavigasi);
+  const input = document.getElementById('input-pencarian');
+  input.value = '';
+  input.focus();
+  tampilkanHasil(menuNavigasi); // Tampilkan semua menu di awal
 }
 
+// Fungsi saat user mengetik di kolom pencarian
 function jalankanPencarian() {
   const keyword = document.getElementById('input-pencarian').value.toLowerCase();
-  tampilkanHasil(menuNavigasi.filter(menu => menu.nama.toLowerCase().includes(keyword) || menu.deskripsi.toLowerCase().includes(keyword)));
+  
+  // Filter menu berdasarkan keyword
+  const hasilFilter = menuNavigasi.filter(menu => 
+    menu.nama.toLowerCase().includes(keyword) || 
+    menu.deskripsi.toLowerCase().includes(keyword)
+  );
+  
+  tampilkanHasil(hasilFilter);
 }
 
+// Fungsi untuk merender hasil ke dalam pop-up
 function tampilkanHasil(daftarMenu) {
   const container = document.getElementById('hasil-pencarian');
+  if (!container) return;
   container.innerHTML = '';
-  if (daftarMenu.length === 0) { container.innerHTML = '<p style="text-align:center; color:#64748b; padding: 20px;">Menu tidak ditemukan.</p>'; return; }
+
+  if (daftarMenu.length === 0) {
+    container.innerHTML = '<p style="text-align:center; color:#64748b; padding: 20px;">Menu tidak ditemukan.</p>';
+    return;
+  }
+
   daftarMenu.forEach(menu => {
-    container.innerHTML += `<div class="search-result-item" onclick="pilihMenuDariPencarian('${menu.id}')"><div class="search-result-icon"><i class="fas ${menu.icon}"></i></div><div class="search-result-text"><h4>${menu.nama}</h4><p>${menu.deskripsi}</p></div></div>`;
+    container.innerHTML += `
+      <div class="search-result-item" onclick="pilihMenuDariPencarian('${menu.id}')">
+        <div class="search-result-icon"><i class="fas ${menu.icon}"></i></div>
+        <div class="search-result-text">
+          <h4>${menu.nama}</h4>
+          <p>${menu.deskripsi}</p>
+        </div>
+      </div>
+    `;
   });
 }
 
+// Fungsi klik menu dari hasil pencarian
 function pilihMenuDariPencarian(idMenu) {
+  // Tutup pop-up
   closeModal('modal-pencarian');
+  
+  // Klik menu di sidebar secara otomatis
   const sidebarItem = document.querySelector(`.sidebar .menu li[data-page="${idMenu}"]`);
   if(sidebarItem) sidebarItem.click();
 }
