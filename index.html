@@ -448,7 +448,7 @@
     </div>
   </div>
 
-   <!-- Modal Lihat Detail Warga -->
+     <!-- Modal Lihat Detail Warga -->
   <div id="modal-lihat-warga" class="modal">
     <div class="modal-content">
       <h3>Detail Data Warga</h3>
@@ -464,7 +464,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Modal Edit Warga -->
   <div id="modal-edit-warga" class="modal">
     <div class="modal-content">
@@ -617,7 +617,7 @@
    <!-- ================= FIREBASE SDK ================= -->
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
     // Impor modul Authentication
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
 
@@ -650,6 +650,11 @@
     window.fbSignIn = signInWithEmailAndPassword;
     window.fbSignOut = signOut;
     window.fbOnAuthStateChanged = onAuthStateChanged;
+
+    // Ekspos fungsi tambahan
+    window.fbGetDoc = getDoc;
+    window.fbUpdateDoc = updateDoc;
+    
   </script>
 
   <!-- Script Utama Anda -->

@@ -1225,9 +1225,8 @@ async function updateStatusSurat(idDokumen, statusBaru) {
 // ============ FUNGSI LIHAT WARGA ============
 async function lihatWarga(idDokumen) {
   try {
-    const { getDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
     const docRef = window.fbDoc(window.firebaseDB, "warga", idDokumen);
-    const docSnap = await getDoc(docRef);
+    const docSnap = await window.fbGetDoc(docRef);
 
     if (docSnap.exists()) {
       const w = docSnap.data();
@@ -1242,6 +1241,7 @@ async function lihatWarga(idDokumen) {
     }
   } catch (error) {
     console.error("Error lihat: ", error);
+    alert("Gagal mengambil data: " + error.message);
   }
 }
 
