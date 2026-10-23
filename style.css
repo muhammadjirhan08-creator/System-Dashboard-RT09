@@ -820,3 +820,7 @@ button.btn-login:hover {
 .topbar #page-title {
   display: none;
 }
+.badge-warning { 
+  background: #fef3c7; 
+  color: #92400e; 
+}

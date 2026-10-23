@@ -705,8 +705,15 @@ function renderSurat() {
       `;
 
       // Jika yang login adalah Admin, tambahkan tombol Edit (meskipun saat ini belum ada fungsi edit surat) dan Hapus
-      if (isAdmin) {
+           if (isAdmin) {
         tombolAksi += `
+          <!-- Tombol Approve -->
+          <button class="btn-secondary" onclick="updateStatusSurat('${doc.id}', 'Disetujui')" style="margin-left: 5px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Setujui"><i class="fas fa-check"></i></button>
+          
+          <!-- Tombol Reject -->
+          <button class="btn-secondary" onclick="updateStatusSurat('${doc.id}', 'Ditolak')" style="margin-left: 5px; background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Tolak"><i class="fas fa-times"></i></button>
+          
+          <!-- Tombol Hapus -->
           <button class="btn-secondary" onclick="hapusSuratDariList('${doc.id}')" style="margin-left: 5px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
         `;
       }
@@ -844,7 +851,6 @@ function renderHomeSurat() {
   const homeSuratList = document.getElementById('home-list-surat');
   if (!homeSuratList) return;
 
-  // Gunakan onSnapshot agar data di Home juga terupdate otomatis
   window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "surat"), (snapshot) => {
     homeSuratList.innerHTML = ''; 
 
@@ -853,27 +859,30 @@ function renderHomeSurat() {
       return;
     }
 
-    // Ambil maksimal 2 surat terbaru (karena data Firebase berurutan dari atas ke bawah, kita balik urutannya)
     const suratArray = [];
     snapshot.forEach((doc) => {
       suratArray.push(doc.data());
     });
     
-    // Ambil 2 data terakhir
     const recentSurat = suratArray.slice(-2).reverse(); 
     
     recentSurat.forEach((s) => {
+      // Tentukan warna badge berdasarkan status
+      let badgeClass = 'badge-danger'; // Merah (untuk Ditolak)
+      if (s.status === 'Disetujui') badgeClass = 'badge-success'; // Hijau
+      if (!s.status || s.status === 'Menunggu') badgeClass = 'badge-warning'; // Kuning
+
       homeSuratList.innerHTML += `
         <div class="list-item">
           <div class="list-icon orange"><i class="fas fa-file-alt"></i></div>
           <div class="list-content">
             <h4>Surat Pengantar - ${s.keperluan}</h4>
             <p>Pemohon: <strong>${s.nama}</strong></p>
-            <small>Status: <span class="badge badge-success">${s.status || 'Menunggu'}</span></small>
+            <small>Status: <span class="badge ${badgeClass}">${s.status || 'Menunggu'}</span></small>
           </div>
         </div>`;
     });
-  });
+  }); // <--- Tanda penutup onSnapshot ada di sini
 }
 
 // =======================================================
@@ -1150,5 +1159,21 @@ async function printSuratDariFirebase(idDokumen) {
   } catch (error) {
     console.error("Error print: ", error);
     alert("Gagal mencetak surat.");
+  }
+}
+async function updateStatusSurat(idDokumen, statusBaru) {
+  try {
+    const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    const docRef = window.fbDoc(window.firebaseDB, "surat", idDokumen);
+    
+    // Update status di database
+    await updateDoc(docRef, {
+      status: statusBaru
+    });
+    
+    alert(`Surat berhasil di${statusBaru === 'Disetujui' ? 'setujui' : 'tolak'}!`);
+  } catch (error) {
+    console.error("Error update status: ", error);
+    alert("Gagal memproses surat.");
   }
 }
