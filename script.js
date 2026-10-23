@@ -843,26 +843,35 @@ function renderHomeSurat() {
   const homeSuratList = document.getElementById('home-list-surat');
   if (!homeSuratList) return;
 
-  homeSuratList.innerHTML = ''; 
+  // Gunakan onSnapshot agar data di Home juga terupdate otomatis
+  window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "surat"), (snapshot) => {
+    homeSuratList.innerHTML = ''; 
 
-  if (dataSurat.length === 0) {
-    homeSuratList.innerHTML = '<p style="color:#64748b; font-size:13px;">Belum ada permohonan surat terbaru.</p>';
-    return;
-  }
+    if (snapshot.empty) {
+      homeSuratList.innerHTML = '<p style="color:#64748b; font-size:13px;">Belum ada permohonan surat terbaru.</p>';
+      return;
+    }
 
-  const recentSurat = dataSurat.slice(-2).reverse(); 
-  
-  recentSurat.forEach((s) => {
-    homeSuratList.innerHTML += `
-      <div class="list-item">
-        <div class="list-icon orange"><i class="fas fa-file-alt"></i></div>
-        <div class="list-content">
-          <!-- MENAMPILKAN KEPERLUAN SURAT -->
-          <h4>Surat Pengantar - ${s.keperluan}</h4>
-          <p>Pemohon: <strong>${s.nama}</strong></p>
-          <small>Status: <span class="badge badge-success">Selesai</span></small>
-        </div>
-      </div>`;
+    // Ambil maksimal 2 surat terbaru (karena data Firebase berurutan dari atas ke bawah, kita balik urutannya)
+    const suratArray = [];
+    snapshot.forEach((doc) => {
+      suratArray.push(doc.data());
+    });
+    
+    // Ambil 2 data terakhir
+    const recentSurat = suratArray.slice(-2).reverse(); 
+    
+    recentSurat.forEach((s) => {
+      homeSuratList.innerHTML += `
+        <div class="list-item">
+          <div class="list-icon orange"><i class="fas fa-file-alt"></i></div>
+          <div class="list-content">
+            <h4>Surat Pengantar - ${s.keperluan}</h4>
+            <p>Pemohon: <strong>${s.nama}</strong></p>
+            <small>Status: <span class="badge badge-success">${s.status || 'Menunggu'}</span></small>
+          </div>
+        </div>`;
+    });
   });
 }
 
