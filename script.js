@@ -730,3 +730,14 @@ function filterWarga() {
     row.style.display = nama.includes(keyword) ? '' : 'none';
   });
 }
+function bukaPoster() {
+  const posterHome = document.querySelector('.campaign-img');
+  if (posterHome) {
+    document.getElementById('poster-full').src = posterHome.src;
+    document.getElementById('modal-poster').classList.add('active');
+  }
+}
+
+function tutupPoster() {
+  document.getElementById('modal-poster').classList.remove('active');
+}

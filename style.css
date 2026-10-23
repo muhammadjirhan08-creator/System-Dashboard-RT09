@@ -394,22 +394,24 @@ button.btn-login:hover {
 /* 3. KOTAK POSTER CAMPAIGN */
 .campaign-box {
   width: 100%;
-  height: 400px; /* Mengatur tinggi kotak */
-  overflow-y: scroll; /* MEMAKSA SCROLLBAR SELALU MUNCUL */
+  height: 400px; /* Tinggi kotak */
+  overflow-y: scroll; /* Memaksa scrollbar selalu muncul */
   border-radius: 8px;
   border: 1px solid #e2e8f0;
   background-color: #f8fafc;
-  
-  /* Membuat poster di tengah */
   display: flex;
   justify-content: center; 
   align-items: flex-start; 
 }
 
 .campaign-img {
-  max-width: 100%; /* Gambar tidak akan melebihi lebar kotak */
-  height: auto; /* Membiarkan gambar setinggi aslinya (memanjang ke bawah) */
+  width: 100%; 
+  height: auto; 
   display: block; 
+  transition: opacity 0.2s;
+}
+.campaign-img:hover {
+  opacity: 0.9; /* Efek sedikit redup saat kursor diarahkan */
 }
 /* Penambahan style untuk teks campaign */
 .campaign-text h4 { font-weight: 700; }
