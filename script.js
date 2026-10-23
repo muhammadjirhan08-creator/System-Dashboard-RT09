@@ -1209,3 +1209,75 @@ async function updateStatusSurat(idDokumen, statusBaru) {
     alert("Gagal memproses surat.");
   }
 }
+// ============ FUNGSI LIHAT WARGA ============
+async function lihatWarga(idDokumen) {
+  try {
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    const docRef = window.fbDoc(window.firebaseDB, "warga", idDokumen);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const w = docSnap.data();
+      document.getElementById('lihat-nama').innerText = w.nama || '-';
+      document.getElementById('lihat-nik').innerText = w.nik || '-';
+      document.getElementById('lihat-kk').innerText = w.noKtp || '-';
+      document.getElementById('lihat-jk').innerText = w.jk === 'L' ? 'Laki-laki' : 'Perempuan';
+      document.getElementById('lihat-pekerjaan').innerText = w.pekerjaan || '-';
+      document.getElementById('lihat-alamat').innerText = w.alamat || '-';
+      document.getElementById('lihat-status').innerText = w.status || '-';
+      document.getElementById('modal-lihat-warga').classList.add('active');
+    }
+  } catch (error) {
+    console.error("Error lihat: ", error);
+  }
+}
+
+// ============ FUNGSI EDIT WARGA ============
+async function openEditWarga(idDokumen) {
+  try {
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    const docRef = window.fbDoc(window.firebaseDB, "warga", idDokumen);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const w = docSnap.data();
+      document.getElementById('edit-w-id').value = idDokumen;
+      document.getElementById('edit-w-nama').value = w.nama || '';
+      document.getElementById('edit-w-nik').value = w.nik || '';
+      document.getElementById('edit-w-kk').value = w.noKtp || '';
+      document.getElementById('edit-w-jk').value = w.jk || 'L';
+      document.getElementById('edit-w-pekerjaan').value = w.pekerjaan || '';
+      document.getElementById('edit-w-alamat').value = w.alamat || '';
+      document.getElementById('edit-w-status').value = w.status || 'Tetap';
+      document.getElementById('modal-edit-warga').classList.add('active');
+    }
+  } catch (error) {
+    console.error("Error edit: ", error);
+  }
+}
+
+// ============ FUNGSI SIMPAN EDIT WARGA ============
+async function simpanEditWarga() {
+  const idDokumen = document.getElementById('edit-w-id').value;
+  const dataBaru = {
+    nama: document.getElementById('edit-w-nama').value.trim(),
+    nik: document.getElementById('edit-w-nik').value.trim(),
+    noKtp: document.getElementById('edit-w-kk').value.trim(),
+    jk: document.getElementById('edit-w-jk').value,
+    pekerjaan: document.getElementById('edit-w-pekerjaan').value.trim(),
+    alamat: document.getElementById('edit-w-alamat').value.trim(),
+    status: document.getElementById('edit-w-status').value
+  };
+
+  try {
+    const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    const docRef = window.fbDoc(window.firebaseDB, "warga", idDokumen);
+    await updateDoc(docRef, dataBaru);
+    
+    alert('Data warga berhasil diupdate!');
+    closeModal('modal-edit-warga');
+  } catch (error) {
+    console.error("Error update: ", error);
+    alert('Gagal mengupdate data.');
+  }
+}
