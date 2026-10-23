@@ -476,7 +476,9 @@ function hapusIuran(index) {
 // 10. PENGUMUMAN
 // =======================================================
 function renderPengumuman() {
-  // 1. TAMPILKAN DI HALAMAN MENU PENGUMUMAN
+  // ==========================================
+  // BAGIAN 1: UNTUK HALAMAN MENU PENGUMUMAN
+  // ==========================================
   const list = document.getElementById('list-pengumuman');
   if(list) {
     window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengumuman"), (snapshot) => {
@@ -487,18 +489,33 @@ function renderPengumuman() {
       }
       snapshot.forEach((doc) => {
         const p = doc.data();
+        
+        // Pesan WhatsApp
+        const pesanWA = encodeURIComponent(`*PENGUMUMAN RT 09 KARANG REJO*\n\n*Judul:* ${p.judul}\n*Tanggal:* ${p.tanggal}\n\n${p.isi}\n\n_— Sistem Informasi RT 09_`);
+        const linkWA = `https://wa.me/?text=${pesanWA}`;
+
         list.innerHTML += `
           <div class="pengumuman-item" style="position: relative;">
             <h4>${p.judul}</h4>
             <p>${p.isi}</p>
             <small>📅 ${p.tanggal}</small>
-            <button class="btn-secondary" onclick="hapusPengumuman('${doc.id}')" style="position: absolute; top: 15px; right: 15px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;"><i class="fas fa-trash"></i></button>
+            
+            <div style="position: absolute; top: 15px; right: 15px; display: flex; gap: 5px;">
+              <a href="${linkWA}" target="_blank" class="btn-secondary" style="background: #25D366; color: white; border: none; padding: 5px 10px; border-radius: 5px; text-decoration: none;" title="Bagikan ke WhatsApp">
+                <i class="fab fa-whatsapp"></i>
+              </a>
+              <button class="btn-secondary" onclick="hapusPengumuman('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
           </div>`;
       });
     });
   }
 
-  // 2. TAMPILKAN DI KOTAK HOME
+  // ==========================================
+  // BAGIAN 2: UNTUK KOTAK DI HALAMAN HOME
+  // ==========================================
   const homeList = document.getElementById('home-list-pengumuman');
   if (homeList) {
     window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengumuman"), (snapshot) => {
@@ -507,18 +524,22 @@ function renderPengumuman() {
         homeList.innerHTML = '<p style="color:#64748b; font-size:13px;">Belum ada pengumuman terbaru.</p>';
         return;
       }
+      
       let count = 0;
       snapshot.forEach((doc) => {
         if (count < 3) {
           const p = doc.data();
           homeList.innerHTML += `
-            <div class="list-item">
+            <div class="list-item" style="position: relative;">
               <div class="list-icon green"><i class="fas fa-bullhorn"></i></div>
               <div class="list-content">
                 <h4>${p.judul}</h4>
                 <p>${p.isi}</p>
                 <small>📅 ${p.tanggal}</small>
               </div>
+              <a href="https://wa.me/?text=${encodeURIComponent(`*PENGUMUMAN RT 09*\n\n*${p.judul}*\n${p.isi}\n\n_— RT 09 Karang Rejo_`)}" target="_blank" style="position: absolute; top: 15px; right: 15px; color: #25D366; font-size: 20px;" title="Bagikan ke WhatsApp">
+                <i class="fab fa-whatsapp"></i>
+              </a>
             </div>`;
           count++;
         }
