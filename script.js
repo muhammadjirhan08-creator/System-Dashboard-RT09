@@ -356,3 +356,117 @@ function filterWarga() {
     }
   });
 }
+
+// =======================================================
+// DATA KK (RENDER, SIMPAN, EDIT, HAPUS)
+// =======================================================
+function renderKK() {
+  const tbody = document.querySelector('#table-kk tbody'); 
+  if(!tbody) return;
+  
+  window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "kk"), (snapshot) => {
+    tbody.innerHTML = '';
+    dataKK = [];
+    
+    if (snapshot.empty) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Belum ada data KK.</td></tr>';
+      return;
+    }
+
+    let i = 1;
+    snapshot.forEach((doc) => {
+      const k = doc.data();
+      k.id = doc.id;
+      dataKK.push(k);
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${i++}</td>
+          <td>${k.nomor || '-'}</td>
+          <td>${k.kepala || '-'}</td>
+          <td>${k.jumlah || '-'} Orang</td>
+          <td>${k.alamat || '-'}</td>
+          <td style="white-space: nowrap;">
+            <button class="btn-secondary" onclick="openEditKK('${doc.id}')" style="margin-right: 5px; background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px;"><i class="fas fa-edit"></i></button>
+            <button class="btn-secondary" onclick="hapusKK('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>`;
+    });
+    
+    const totalKkEl = document.getElementById('total-kk');
+    if(totalKkEl) totalKkEl.innerText = dataKK.length;
+  });
+}
+
+async function simpanKK() {
+  const nomor = document.getElementById('kk-nomor').value.trim();
+  const kepala = document.getElementById('kk-kepala').value.trim();
+  const jumlah = document.getElementById('kk-jumlah').value.trim();
+  const alamat = document.getElementById('kk-alamat').value.trim();
+  
+  if (!nomor || !kepala || !alamat) return alert('Lengkapi data KK!');
+  
+  try {
+    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "kk"), { nomor, kepala, jumlah, alamat });
+    alert('Data KK berhasil ditambahkan!');
+    closeModal('modal-kk');
+    document.getElementById('kk-nomor').value = '';
+    document.getElementById('kk-kepala').value = '';
+    document.getElementById('kk-jumlah').value = '';
+    document.getElementById('kk-alamat').value = '';
+  } catch (error) { console.error("Error: ", error); alert('Gagal menyimpan.'); }
+}
+
+async function openEditKK(idDokumen) {
+  try {
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    const docSnap = await getDoc(window.fbDoc(window.firebaseDB, "kk", idDokumen));
+    if (docSnap.exists()) {
+      const k = docSnap.data();
+      document.getElementById('edit-kk-id').value = idDokumen;
+      document.getElementById('edit-kk-nomor').value = k.nomor || '';
+      document.getElementById('edit-kk-kepala').value = k.kepala || '';
+      document.getElementById('edit-kk-jumlah').value = k.jumlah || '';
+      document.getElementById('edit-kk-alamat').value = k.alamat || '';
+      document.getElementById('modal-edit-kk').classList.add('active');
+    }
+  } catch (error) { console.error("Error: ", error); }
+}
+
+async function simpanEditKK() {
+  const idDokumen = document.getElementById('edit-kk-id').value;
+  const dataBaru = {
+    nomor: document.getElementById('edit-kk-nomor').value.trim(),
+    kepala: document.getElementById('edit-kk-kepala').value.trim(),
+    jumlah: document.getElementById('edit-kk-jumlah').value.trim(),
+    alamat: document.getElementById('edit-kk-alamat').value.trim()
+  };
+  try {
+    const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    await updateDoc(window.fbDoc(window.firebaseDB, "kk", idDokumen), dataBaru);
+    alert('Data KK diupdate!');
+    closeModal('modal-edit-kk');
+  } catch (error) { console.error("Error: ", error); }
+}
+
+async function hapusKK(idDokumen) {
+  if (confirm('Hapus data KK ini?')) {
+    try { await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "kk", idDokumen)); } 
+    catch (error) { console.error("Error: ", error); }
+  }
+}
+function downloadTemplate() {
+  const headers = ["Nama Lengkap", "NIK", "No KK", "Jenis Kelamin (L/P)", "Pekerjaan", "Alamat Lengkap", "Status (Tetap/Kontrak)"];
+  const csvString = headers.join(',') + "\nBudi Santoso,3201234567890001,6471012345670001,L,Karyawan Swasta,Jl. Melati No.1,Tetap";
+  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Template_Import_Warga.csv';
+  a.click();
+}
+
+function openModalImport() {
+  alert("Fitur Import sedang dalam pengembangan.");
+  // document.getElementById('modal-import').classList.add('active');
+}
