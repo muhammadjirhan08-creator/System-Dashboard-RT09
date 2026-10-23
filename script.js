@@ -56,14 +56,37 @@ document.addEventListener('keydown', function(e) {
 
 document.querySelectorAll('.sidebar .menu li[data-page]').forEach(item => {
   item.addEventListener('click', () => {
+    const page = item.dataset.page;
+    const namaUserAktif = sessionStorage.getItem('namaUser') || '';
+    
+    // Daftar menu yang hanya boleh diakses Admin
+    const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
+    const isAdmin = adminPenuh.includes(namaUserAktif);
+    const menuTerlarang = ['warga', 'kk', 'iuran', 'pengumuman'];
+
+    // JIKA WARGA MENCOBA AKSES MENU TERLARANG
+    if (!isAdmin && menuTerlarang.includes(page)) {
+      // Sembunyikan semua halaman, tampilkan halaman akses ditolak
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('akses-ditolak').classList.add('active');
+      document.getElementById('page-title').textContent = 'Akses Ditolak';
+      
+      // (Opsional) Highlight menu di sidebar agar terlihat diklik
+      document.querySelectorAll('.sidebar .menu li').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      
+      return; // Hentikan eksekusi, jangan buka menunya
+    }
+
+    // JIKA DIIZINKAN (ADMIN ATAU MENU YANG BOLEH)
     document.querySelectorAll('.sidebar .menu li').forEach(i => i.classList.remove('active'));
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     
     item.classList.add('active');
-    const page = item.dataset.page;
     document.getElementById(page).classList.add('active');
     document.getElementById('page-title').textContent = item.textContent.trim();
     
+    // Render data sesuai halaman
     if (page === 'dashboard') renderCharts(); 
     if (page === 'warga') renderWarga();
     if (page === 'kk') renderKK();
