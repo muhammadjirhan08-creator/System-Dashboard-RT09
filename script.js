@@ -513,30 +513,61 @@ function hapusIuran(index) {
 // =======================================================
 // 10. PENGUMUMAN
 // =======================================================
-function renderPengumuman() {
-  const list = document.getElementById('list-pengumuman');
-  if(!list) return;
+const list = document.getElementById('list-pengumuman');
+  if(list) {
+    window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengumuman"), (snapshot) => {
+      list.innerHTML = '';
+      
+      if (snapshot.empty) {
+        list.innerHTML = '<p style="color:#64748b">Belum ada pengumuman.</p>';
+        return;
+      }
 
-  window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengumuman"), (snapshot) => {
-    list.innerHTML = '';
-    
-    if (snapshot.empty) {
-      list.innerHTML = '<p style="color:#64748b">Belum ada pengumuman.</p>';
-      return;
-    }
-
-    snapshot.forEach((doc) => {
-      const p = doc.data();
-      list.innerHTML += `
-        <div class="pengumuman-item" style="position: relative;">
-          <h4>${p.judul}</h4>
-          <p>${p.isi}</p>
-          <small>📅 ${p.tanggal}</small>
-          <button class="btn-secondary" onclick="hapusPengumuman('${doc.id}')" style="position: absolute; top: 15px; right: 15px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;"><i class="fas fa-trash"></i></button>
-        </div>`;
+      snapshot.forEach((doc) => {
+        const p = doc.data();
+        list.innerHTML += `
+          <div class="pengumuman-item" style="position: relative;">
+            <h4>${p.judul}</h4>
+            <p>${p.isi}</p>
+            <small>📅 ${p.tanggal}</small>
+            <button class="btn-secondary" onclick="hapusPengumuman('${doc.id}')" style="position: absolute; top: 15px; right: 15px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;"><i class="fas fa-trash"></i></button>
+          </div>`;
+      });
     });
-  });
-}
+  }
+
+  // ==========================================
+  // BAGIAN 2: UNTUK KOTAK DI HALAMAN HOME
+  // ==========================================
+  const homeList = document.getElementById('home-list-pengumuman');
+  if (homeList) {
+    window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengumuman"), (snapshot) => {
+      homeList.innerHTML = ''; 
+      
+      if (snapshot.empty) {
+        homeList.innerHTML = '<p style="color:#64748b; font-size:13px;">Belum ada pengumuman terbaru.</p>';
+        return;
+      }
+      
+      // Tampilkan maksimal 3 pengumuman terbaru
+      let count = 0;
+      snapshot.forEach((doc) => {
+        if (count < 3) {
+          const p = doc.data();
+          homeList.innerHTML += `
+            <div class="list-item">
+              <div class="list-icon green"><i class="fas fa-bullhorn"></i></div>
+              <div class="list-content">
+                <h4>${p.judul}</h4>
+                <p>${p.isi}</p>
+                <small>📅 ${p.tanggal}</small>
+              </div>
+            </div>`;
+          count++;
+        }
+      });
+    });
+  }
 
 async function simpanPengumuman() {
   const judul = document.getElementById('p-judul').value.trim();
