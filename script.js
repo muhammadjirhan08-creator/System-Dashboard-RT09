@@ -1,8 +1,6 @@
 // =======================================================
 // 1. EVENT LISTENER (SHORTCUT & LOGIN CHECK)
 // =======================================================
-
-// Ini untuk Shortcut Ctrl + H dan ESC
 document.addEventListener('keydown', function(e) {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'h') {
     e.preventDefault(); 
@@ -13,7 +11,6 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-// Ini untuk cek login saat halaman dimuat
 document.addEventListener('DOMContentLoaded', () => {
   const isLoggedIn = sessionStorage.getItem('isLoggedIn');
   if (isLoggedIn === 'true') {
@@ -45,7 +42,7 @@ let dataPengumuman = [];
 let dataSurat = []; 
 
 // =======================================================
-// 3. JAM & NAVIGASI
+// 3. JAM & NAVIGASI (DENGAN HAK AKSES)
 // =======================================================
 function updateClock() {
   const now = new Date();
@@ -58,51 +55,32 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock(); 
 
-document.addEventListener('keydown', function(e) {
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'h') {
-    e.preventDefault(); bukaPencarian(); 
-  }
-  if (e.key === 'Escape') {
-    closeModal('modal-pencarian');
-  }
-});
-
 document.querySelectorAll('.sidebar .menu li[data-page]').forEach(item => {
   item.addEventListener('click', () => {
     const page = item.dataset.page;
     const namaUserAktif = sessionStorage.getItem('namaUser') || '';
     
-    // Daftar menu yang hanya boleh diakses Admin
     const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
     const isAdmin = adminPenuh.includes(namaUserAktif);
     const menuTerlarang = ['warga', 'kk', 'iuran', 'pengumuman'];
 
-    // JIKA WARGA MENCOBA AKSES MENU TERLARANG
     if (!isAdmin && menuTerlarang.includes(page)) {
-      // Sembunyikan semua halaman, tampilkan halaman akses ditolak
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('akses-ditolak').classList.add('active');
       document.getElementById('page-title').textContent = 'Akses Ditolak';
-      
-      // (Opsional) Highlight menu di sidebar agar terlihat diklik
       document.querySelectorAll('.sidebar .menu li').forEach(i => i.classList.remove('active'));
       item.classList.add('active');
-      
-      return; // Hentikan eksekusi, jangan buka menunya
+      return; 
     }
 
-    // JIKA DIIZINKAN (ADMIN ATAU MENU YANG BOLEH)
     document.querySelectorAll('.sidebar .menu li').forEach(i => i.classList.remove('active'));
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     
     item.classList.add('active');
     document.getElementById(page).classList.add('active');
     const pageTitleEl = document.getElementById('page-title');
-    if (pageTitleEl) {
-      pageTitleEl.textContent = item.textContent.trim();
-    }
+    if (pageTitleEl) pageTitleEl.textContent = item.textContent.trim();
     
-    // Render data sesuai halaman
     if (page === 'dashboard') renderCharts(); 
     if (page === 'warga') renderWarga();
     if (page === 'kk') renderKK();
@@ -330,13 +308,13 @@ async function hapusWarga(idDokumen) {
 }
 
 // =======================================================
-// 7. EXPORT EXCEL & IMPORT
+// 7. EXPORT EXCEL
 // =======================================================
 function exportExcel() {
   if (dataWarga.length === 0) return alert('Tidak ada data untuk diexport.');
   let tableHTML = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>ID</th><th>Nama</th><th>NIK</th><th>No. KK</th><th>Jenis Kelamin</th><th>Pekerjaan</th><th>Alamat</th><th>Status</th></tr></thead><tbody>`;
+  
   dataWarga.forEach((w, index) => {
-    // LOGIKA PERUBAHAN JENIS KELAMIN
     let jenisKelaminLengkap = '-';
     if (w.jk === 'L') jenisKelaminLengkap = 'Laki-laki';
     if (w.jk === 'P') jenisKelaminLengkap = 'Perempuan';
@@ -347,7 +325,7 @@ function exportExcel() {
         <td>${w.nama || '-'}</td>
         <td>${w.nik || '-'}</td>
         <td>${w.noKK || '-'}</td>
-        <td>${jenisKelaminLengkap}</td> <!-- Menggunakan variabel yang sudah diubah -->
+        <td>${jenisKelaminLengkap}</td>
         <td>${w.pekerjaan || '-'}</td>
         <td>${w.alamat || '-'}</td>
         <td>${w.status || '-'}</td>
@@ -356,7 +334,6 @@ function exportExcel() {
   });
 
   tableHTML += `</tbody></table></body></html>`;
-
   const blob = new Blob([tableHTML], { type: 'application/vnd.ms-excel' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -407,29 +384,14 @@ async function simpanKK() {
   const jumlah = document.getElementById('kk-jumlah').value.trim();
   const alamat = document.getElementById('kk-alamat').value.trim();
   
-  if (!nomor || !kepala || !alamat) {
-    return alert('Lengkapi data KK (Nomor, Kepala, dan Alamat)!');
-  }
+  if (!nomor || !kepala || !alamat) return alert('Lengkapi data KK (Nomor, Kepala, dan Alamat)!');
 
   try {
-    // Simpan ke Firebase
-    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "kk"), { 
-      nomor, kepala, jumlah, alamat 
-    });
-    
+    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "kk"), { nomor, kepala, jumlah, alamat });
     alert('Data KK berhasil ditambahkan!');
     closeModal('modal-kk');
-    
-    // Kosongkan form setelah disimpan
-    document.getElementById('kk-nomor').value = '';
-    document.getElementById('kk-kepala').value = '';
-    document.getElementById('kk-jumlah').value = '';
-    document.getElementById('kk-alamat').value = '';
-    
-  } catch (error) {
-    console.error("Error simpan KK: ", error);
-    alert('Gagal menyimpan data KK. Periksa koneksi internet.');
-  }
+    document.getElementById('kk-nomor').value = ''; document.getElementById('kk-kepala').value = ''; document.getElementById('kk-jumlah').value = ''; document.getElementById('kk-alamat').value = '';
+  } catch (error) { console.error("Error simpan KK: ", error); alert('Gagal menyimpan data KK. Periksa koneksi internet.'); }
 }
 
 async function openEditKK(idDokumen) {
@@ -513,7 +475,9 @@ function hapusIuran(index) {
 // =======================================================
 // 10. PENGUMUMAN
 // =======================================================
-const list = document.getElementById('list-pengumuman');
+function renderPengumuman() {
+  // 1. TAMPILKAN DI HALAMAN MENU PENGUMUMAN
+  const list = document.getElementById('list-pengumuman');
   if(list) {
     window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengumuman"), (snapshot) => {
       list.innerHTML = '';
@@ -534,21 +498,15 @@ const list = document.getElementById('list-pengumuman');
     });
   }
 
-  // ==========================================
-  // BAGIAN 2: UNTUK KOTAK DI HALAMAN HOME
-  // ==========================================
- function renderPengumuman() {
+  // 2. TAMPILKAN DI KOTAK HOME
   const homeList = document.getElementById('home-list-pengumuman');
   if (homeList) {
     window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengumuman"), (snapshot) => {
       homeList.innerHTML = ''; 
-      
       if (snapshot.empty) {
         homeList.innerHTML = '<p style="color:#64748b; font-size:13px;">Belum ada pengumuman terbaru.</p>';
         return;
       }
-      
-      // Tampilkan maksimal 3 pengumuman terbaru
       let count = 0;
       snapshot.forEach((doc) => {
         if (count < 3) {
@@ -567,7 +525,7 @@ const list = document.getElementById('list-pengumuman');
       });
     });
   }
-}// <--- PENUTUP FUNGSI
+}
 
 async function simpanPengumuman() {
   const judul = document.getElementById('p-judul').value.trim();
@@ -578,32 +536,20 @@ async function simpanPengumuman() {
   const tanggal = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
   
   try {
-    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "pengumuman"), {
-      judul: judul,
-      isi: isi,
-      tanggal: tanggal
-    });
-    
+    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "pengumuman"), { judul, isi, tanggal });
     alert('Pengumuman berhasil ditambahkan!');
     closeModal('modal-pengumuman');
-    
     document.getElementById('p-judul').value = '';
     document.getElementById('p-isi').value = '';
-    
-  } catch (error) {
-    console.error("Error simpan pengumuman: ", error);
-    alert('Gagal menyimpan pengumuman. Periksa koneksi internet.');
-  }
+  } catch (error) { console.error("Error simpan pengumuman: ", error); alert('Gagal menyimpan pengumuman. Periksa koneksi internet.'); }
 }
+
 async function hapusPengumuman(idDokumen) {
   if (confirm('Hapus pengumuman ini?')) {
     try {
       await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "pengumuman", idDokumen));
       alert('Pengumuman berhasil dihapus!');
-    } catch (error) {
-      console.error("Error hapus: ", error);
-      alert("Gagal menghapus pengumuman.");
-    }
+    } catch (error) { console.error("Error hapus: ", error); alert("Gagal menghapus pengumuman."); }
   }
 }
 
@@ -611,48 +557,26 @@ async function hapusPengumuman(idDokumen) {
 // 11. CHART / GRAFIK
 // =======================================================
 function renderCharts() {
-  // Hancurkan grafik lama jika sudah ada
-  if (window.myChartIuran) {
-    window.myChartIuran.destroy();
-  }
-  if (window.myChartWarga) {
-    window.myChartWarga.destroy();
-  }
+  if (window.myChartIuran) window.myChartIuran.destroy();
+  if (window.myChartWarga) window.myChartWarga.destroy();
 
   const chartIuranEl = document.getElementById('chartIuran');
   if(chartIuranEl) {
     window.myChartIuran = new Chart(chartIuranEl, {
       type: 'bar',
-      data: {
-        labels: ['Agu', 'Sep', 'Okt', 'Nov', 'Des', 'Jan'],
-        datasets: [{
-          label: 'Iuran (Rp)',
-          data: [450000, 500000, 480000, 520000, 550000, 500000],
-          backgroundColor: '#3b82f6',
-          borderRadius: 6
-        }]
-      },
+      data: { labels: ['Agu', 'Sep', 'Okt', 'Nov', 'Des', 'Jan'], datasets: [{ label: 'Iuran (Rp)', data: [450000, 500000, 480000, 520000, 550000, 500000], backgroundColor: '#3b82f6', borderRadius: 6 }] },
       options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
     });
   }
-
   const chartWargaEl = document.getElementById('chartWarga');
   if(chartWargaEl) {
     window.myChartWarga = new Chart(chartWargaEl, {
       type: 'doughnut',
-      data: {
-        labels: ['Tetap', 'Kontrak'],
-        datasets: [{
-          data: [
-            dataWarga.filter(w => w.status === 'Tetap').length,
-            dataWarga.filter(w => w.status === 'Kontrak').length
-          ],
-          backgroundColor: ['#10b981', '#f59e0b']
-        }]
-      }
+      data: { labels: ['Tetap', 'Kontrak'], datasets: [{ data: [dataWarga.filter(w => w.status === 'Tetap').length, dataWarga.filter(w => w.status === 'Kontrak').length], backgroundColor: ['#10b981', '#f59e0b'] }] }
     });
   }
 }
+
 // =======================================================
 // 12. SURAT PENGANTAR
 // =======================================================
@@ -783,7 +707,6 @@ function lupaPassword() {
   alert("Untuk mereset password, silakan hubungi Admin System RT 09:\n\nNama: Muhammad Jirhan\nNo. HP/WA: 0812-5763-9264\n\nSebutkan nama dan alamat Anda untuk verifikasi.");
 }
 
-// Daftar Menu (Harus ada agar muncul di pop-up)
 const menuNavigasi = [
   { id: 'home', nama: 'Home', icon: 'fa-home', deskripsi: 'Halaman Utama' },
   { id: 'dashboard', nama: 'Dashboard', icon: 'fa-chart-line', deskripsi: 'Statistik & Grafik' },
@@ -795,29 +718,23 @@ const menuNavigasi = [
   { id: 'laporan', nama: 'Laporan', icon: 'fa-file-alt', deskripsi: 'Laporan Keuangan' }
 ];
 
-// Fungsi Buka Modal Pencarian
 function bukaPencarian() {
   document.getElementById('modal-pencarian').classList.add('active');
   const input = document.getElementById('input-pencarian');
   input.value = '';
   input.focus();
-  tampilkanHasil(menuNavigasi); // Tampilkan semua menu di awal
+  tampilkanHasil(menuNavigasi);
 }
 
-// Fungsi saat user mengetik di kolom pencarian
 function jalankanPencarian() {
   const keyword = document.getElementById('input-pencarian').value.toLowerCase();
-  
-  // Filter menu berdasarkan keyword
   const hasilFilter = menuNavigasi.filter(menu => 
     menu.nama.toLowerCase().includes(keyword) || 
     menu.deskripsi.toLowerCase().includes(keyword)
   );
-  
   tampilkanHasil(hasilFilter);
 }
 
-// Fungsi untuk merender hasil ke dalam pop-up
 function tampilkanHasil(daftarMenu) {
   const container = document.getElementById('hasil-pencarian');
   if (!container) return;
@@ -841,12 +758,8 @@ function tampilkanHasil(daftarMenu) {
   });
 }
 
-// Fungsi klik menu dari hasil pencarian
 function pilihMenuDariPencarian(idMenu) {
-  // Tutup pop-up
   closeModal('modal-pencarian');
-  
-  // Klik menu di sidebar secara otomatis
   const sidebarItem = document.querySelector(`.sidebar .menu li[data-page="${idMenu}"]`);
   if(sidebarItem) sidebarItem.click();
 }
@@ -862,9 +775,11 @@ function bukaPoster() {
   const posterHome = document.querySelector('.campaign-img');
   if (posterHome) { document.getElementById('poster-full').src = posterHome.src; document.getElementById('modal-poster').classList.add('active'); }
 }
-function tutupPoster() { document.getElementById('modal-poster').classList.remove('active'); }
 
-// Pencarian Tabel Warga
+function tutupPoster() { 
+  document.getElementById('modal-poster').classList.remove('active'); 
+}
+
 function filterWarga() {
   const keyword = document.getElementById('search-warga').value.toLowerCase();
   const rows = document.querySelectorAll('#table-warga tbody tr');
@@ -872,15 +787,4 @@ function filterWarga() {
     const nama = row.querySelector('td:nth-child(3)').innerText.toLowerCase();
     row.style.display = nama.includes(keyword) ? '' : 'none';
   });
-}
-function bukaPoster() {
-  const posterHome = document.querySelector('.campaign-img');
-  if (posterHome) {
-    document.getElementById('poster-full').src = posterHome.src;
-    document.getElementById('modal-poster').classList.add('active');
-  }
-}
-
-function tutupPoster() {
-  document.getElementById('modal-poster').classList.remove('active');
 }
