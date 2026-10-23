@@ -173,7 +173,7 @@ function renderWarga() {
     let index = 1;
     snapshot.forEach((doc) => {
       const w = doc.data();
-      w.id = doc.id; // Simpan ID Firebase ke dalam objek
+      w.id = doc.id; // Simpan ID Firebase
       dataWarga.push(w);
 
       tbody.innerHTML += `
@@ -341,4 +341,17 @@ function exportExcel() {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+}
+function filterWarga() {
+  const keyword = document.getElementById('search-warga').value.toLowerCase();
+  const rows = document.querySelectorAll('#table-warga tbody tr');
+
+  rows.forEach(row => {
+    const nama = row.querySelector('td:nth-child(3)').innerText.toLowerCase(); // Kolom ke-3 adalah Nama
+    if (nama.includes(keyword)) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
 }

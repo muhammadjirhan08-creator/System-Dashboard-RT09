@@ -242,10 +242,10 @@
         </div>
 
         <!-- FITUR SEARCH, EXPORT, IMPORT -->
-        <div class="table-header-controls">
-            <div class="controls-left">
+        <div class="table-header-controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div class="controls-left" style="display: flex; gap: 10px; align-items: center;">
                 <label>Show 
-                    <select id="entriesPerPage" onchange="renderTable()">
+                    <select id="entriesPerPage" onchange="renderWarga()">
                         <option value="10">10</option>
                         <option value="50">50</option>
                         <option value="100">100</option>
@@ -255,9 +255,10 @@
                 <button class="btn-outline" onclick="downloadTemplate()"><i class="fas fa-file-download"></i> Template Excel</button>
                 <button class="btn-import" onclick="openModalImport()"><i class="fas fa-file-import"></i> Import Data</button>
                <button class="btn-secondary" onclick="exportExcel()"><i class="fas fa-file-export"></i> Export Data</button>
+            </div>
             
             <div class="controls-right">
-                <label>Search: <input type="text" id="searchInput" onkeyup="renderTable()" placeholder="Cari nama..."></label>
+                <label>Search: <input type="text" id="search-warga" onkeyup="filterWarga()" placeholder="Cari nama..."></label>
             </div>
         </div>
 
