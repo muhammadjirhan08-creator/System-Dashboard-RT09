@@ -517,12 +517,10 @@ const list = document.getElementById('list-pengumuman');
   if(list) {
     window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengumuman"), (snapshot) => {
       list.innerHTML = '';
-      
       if (snapshot.empty) {
         list.innerHTML = '<p style="color:#64748b">Belum ada pengumuman.</p>';
         return;
       }
-
       snapshot.forEach((doc) => {
         const p = doc.data();
         list.innerHTML += `
@@ -539,6 +537,7 @@ const list = document.getElementById('list-pengumuman');
   // ==========================================
   // BAGIAN 2: UNTUK KOTAK DI HALAMAN HOME
   // ==========================================
+ function renderPengumuman() {
   const homeList = document.getElementById('home-list-pengumuman');
   if (homeList) {
     window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengumuman"), (snapshot) => {
@@ -568,6 +567,7 @@ const list = document.getElementById('list-pengumuman');
       });
     });
   }
+}// <--- PENUTUP FUNGSI
 
 async function simpanPengumuman() {
   const judul = document.getElementById('p-judul').value.trim();
