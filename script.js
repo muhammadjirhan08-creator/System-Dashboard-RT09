@@ -84,7 +84,10 @@ document.querySelectorAll('.sidebar .menu li[data-page]').forEach(item => {
     
     item.classList.add('active');
     document.getElementById(page).classList.add('active');
-    document.getElementById('page-title').textContent = item.textContent.trim();
+    const pageTitleEl = document.getElementById('page-title');
+    if (pageTitleEl) {
+      pageTitleEl.textContent = item.textContent.trim();
+    }
     
     // Render data sesuai halaman
     if (page === 'dashboard') renderCharts(); 
