@@ -347,7 +347,8 @@ function filterWarga() {
   const rows = document.querySelectorAll('#table-warga tbody tr');
 
   rows.forEach(row => {
-    const nama = row.querySelector('td:nth-child(3)').innerText.toLowerCase(); // Kolom ke-3 adalah Nama
+    // Kolom ke-3 (index 2) adalah Nama Lengkap
+    const nama = row.querySelector('td:nth-child(3)').innerText.toLowerCase(); 
     if (nama.includes(keyword)) {
       row.style.display = '';
     } else {
