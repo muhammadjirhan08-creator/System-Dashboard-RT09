@@ -597,6 +597,36 @@
   <!-- SCRIPT DI PALING BAWAH -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+   <!-- ================= FIREBASE SDK ================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+    // Konfigurasi Firebase Anda
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqjx7G3W7zuhopiNFv81KtayHPFR1um-g",
+      authDomain: "erp-rt09-dashboard.firebaseapp.com",
+      projectId: "erp-rt09-dashboard",
+      storageBucket: "erp-rt09-dashboard.firebasestorage.app",
+      messagingSenderId: "592726859375",
+      appId: "1:592726859375:web:1cf6c13f709e74a7c6f79a",
+      measurementId: "G-FN2J1M2G3G"
+    };
+
+    // Inisialisasi Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Ekspos fungsi Firebase ke window agar bisa dipakai di script.js
+    window.firebaseDB = db;
+    window.fbCollection = collection;
+    window.fbAddDoc = addDoc;
+    window.fbOnSnapshot = onSnapshot;
+    window.fbDoc = doc;
+    window.fbDeleteDoc = deleteDoc;
+  </script>
+
+  <!-- Script Utama Anda -->
   <script src="script.js"></script>
 </body>
 </html>

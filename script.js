@@ -651,7 +651,7 @@ function batalTambahSurat() {
   renderSurat(); 
 }
 
-function simpanSuratBaru() {
+async function simpanSuratBaru() {
   const nama = document.getElementById('s-nama').value.trim();
   const nik = document.getElementById('s-nik').value.trim();
   const alamat = document.getElementById('s-alamat').value.trim();
@@ -663,39 +663,54 @@ function simpanSuratBaru() {
 
   const tgl = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
   
-  dataSurat.push({ nama, nik, alamat, keperluan, tanggal: tgl });
-  localStorage.setItem('dataSurat', JSON.stringify(dataSurat));
+  try {
+    // Simpan ke Firestore Cloud
+    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "surat"), {
+      nama: nama,
+      nik: nik,
+      alamat: alamat,
+      keperluan: keperluan,
+      tanggal: tgl,
+      status: 'Menunggu'
+    });
 
-  alert('Surat berhasil disimpan!');
-  renderHomeSurat(); 
-  batalTambahSurat();
+    alert('Surat berhasil dikirim ke sistem RT!');
+    batalTambahSurat();
+  } catch (error) {
+    console.error("Error: ", error);
+    alert('Gagal menyimpan data. Periksa koneksi internet Anda.');
+  }
 }
 
 function renderSurat() {
   const tbody = document.querySelector('#table-surat tbody');
-  if(!tbody) return; 
-  tbody.innerHTML = '';
+  if(!tbody) return;
   
-  if(dataSurat.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b;">Belum ada data surat.</td></tr>';
-    return;
-  }
+  // Dengarkan data secara real-time dari Firebase
+  window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "surat"), (snapshot) => {
+    tbody.innerHTML = '';
+    
+    if (snapshot.empty) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b;">Belum ada data surat.</td></tr>';
+      return;
+    }
 
-  dataSurat.forEach((s, i) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${s.tanggal}</td>
-        <td>${s.nama}</td>
-        <td>${s.nik}</td>
-        <td>${s.keperluan}</td>
-        <td style="white-space: nowrap;">
-          <button class="btn-secondary" onclick="downloadSuratPDF(${i})" style="margin-right: 5px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Download PDF"><i class="fas fa-download"></i></button>
-          <button class="btn-secondary" onclick="printDariList(${i})" style="margin-right: 5px; background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Print"><i class="fas fa-print"></i></button>
-          <button class="btn-secondary" onclick="editSuratDariList(${i})" style="margin-right: 5px; background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Edit"><i class="fas fa-edit"></i></button>
-          <button class="btn-secondary" onclick="hapusSuratDariList(${i})" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
-        </td>
-      </tr>`;
+    let index = 1;
+    snapshot.forEach((doc) => {
+      const s = doc.data();
+      tbody.innerHTML += `
+        <tr>
+          <td>${index++}</td>
+          <td>${s.tanggal}</td>
+          <td>${s.nama}</td>
+          <td>${s.nik}</td>
+          <td>${s.keperluan}</td>
+          <td style="white-space: nowrap;">
+            <button class="btn-secondary" onclick="downloadSuratPDF('${doc.id}')" style="margin-right: 5px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Download PDF"><i class="fas fa-download"></i></button>
+            <button class="btn-secondary" onclick="hapusSuratDariList('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>`;
+    });
   });
 }
 
@@ -731,12 +746,16 @@ function editSuratDariList(index) {
   localStorage.setItem('dataSurat', JSON.stringify(dataSurat));
 }
 
-function hapusSuratDariList(index) {
+async function hapusSuratDariList(idDokumen) {
   if (confirm('Hapus data surat ini?')) {
-    dataSurat.splice(index, 1);
-    localStorage.setItem('dataSurat', JSON.stringify(dataSurat));
-    renderSurat();
-    renderHomeSurat();
+    try {
+      await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "surat", idDokumen));
+      // renderSurat() tidak perlu dipanggil manual karena onSnapshot di renderSurat() 
+      // akan otomatis mendeteksi data yang terhapus dan memperbarui tabel.
+    } catch (error) {
+      console.error("Error menghapus: ", error);
+      alert("Gagal menghapus data. Periksa koneksi internet.");
+    }
   }
 }
 
@@ -773,24 +792,40 @@ function printSurat() {
   }, 1000);
 }
 
-function downloadSuratPDF(index) {
-  const s = dataSurat[index];
-  document.getElementById('hasil-nama').innerText = s.nama;
-  document.getElementById('hasil-nik').innerText = s.nik;
-  document.getElementById('hasil-alamat').innerText = s.alamat;
-  document.getElementById('hasil-keperluan').innerText = s.keperluan;
-  document.getElementById('tgl-surat').innerText = s.tanggal;
+async function downloadSuratPDF(idDokumen) {
+  try {
+    // Ambil data dari Firebase
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    const docRef = window.fbDoc(window.firebaseDB, "surat", idDokumen);
+    const docSnap = await getDoc(docRef);
 
-  const element = document.getElementById('isi-surat');
-  const opt = {
-    margin:       1,
-    filename:     `Surat_Pengantar_${s.nama.replace(/\s+/g, '_')}.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2 },
-    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-  };
+    if (docSnap.exists()) {
+      const s = docSnap.data();
+      
+      // Isi template surat
+      document.getElementById('hasil-nama').innerText = s.nama;
+      document.getElementById('hasil-nik').innerText = s.nik;
+      document.getElementById('hasil-alamat').innerText = s.alamat;
+      document.getElementById('hasil-keperluan').innerText = s.keperluan;
+      document.getElementById('tgl-surat').innerText = s.tanggal;
 
-  html2pdf().set(opt).from(element).save();
+      const element = document.getElementById('isi-surat');
+      const opt = {
+        margin:       1,
+        filename:     `Surat_Pengantar_${s.nama.replace(/\s+/g, '_')}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    } else {
+      alert("Data surat tidak ditemukan di database.");
+    }
+  } catch (error) {
+    console.error("Error download: ", error);
+    alert("Gagal mengunduh PDF.");
+  }
 }
 
 function renderHomeSurat() {
