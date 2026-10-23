@@ -324,17 +324,38 @@
   </div>
 
   <!-- ================= MODAL POP-UP ================= -->
-  <!-- Modal Warga -->
+    <!-- Modal Warga (Tambah) -->
   <div id="modal-warga" class="modal">
     <div class="modal-content">
       <h3>Tambah Warga</h3>
-      <input type="text" id="w-nama" placeholder="Nama lengkap">
-      <input type="text" id="w-nik" placeholder="NIK">
-      <input type="text" id="w-kk" placeholder="No. KK">
-      <select id="w-jk"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select>
-      <input type="text" id="w-pekerjaan" placeholder="Pekerjaan">
-      <input type="text" id="w-alamat" placeholder="Alamat lengkap">
-      <select id="w-status"><option value="Tetap">Tetap</option><option value="Kontrak">Kontrak</option></select>
+      
+      <label>Nama Lengkap</label>
+      <input type="text" id="w-nama" placeholder="Masukkan nama lengkap">
+      
+      <label>NIK</label>
+      <input type="text" id="w-nik" placeholder="Masukkan NIK">
+      
+      <label>No. KK</label>
+      <input type="text" id="w-kk" placeholder="Masukkan No. KK">
+      
+      <label>Jenis Kelamin</label>
+      <select id="w-jk">
+        <option value="L">Laki-laki</option>
+        <option value="P">Perempuan</option>
+      </select>
+      
+      <label>Pekerjaan</label>
+      <input type="text" id="w-pekerjaan" placeholder="Masukkan pekerjaan">
+      
+      <label>Alamat Lengkap</label>
+      <input type="text" id="w-alamat" placeholder="Masukkan alamat lengkap">
+      
+      <label>Status</label>
+      <select id="w-status">
+        <option value="Tetap">Tetap</option>
+        <option value="Kontrak">Kontrak</option>
+      </select>
+      
       <div class="modal-actions">
         <button class="btn-secondary" onclick="closeModal('modal-warga')">Batal</button>
         <button class="btn-primary" onclick="simpanWarga()">Simpan</button>
@@ -376,14 +397,23 @@
     </div>
   </div>
 
-  <!-- Modal KK -->
+    <!-- Modal KK -->
   <div id="modal-kk" class="modal">
     <div class="modal-content">
       <h3>Tambah Data KK</h3>
-      <input type="text" id="kk-nomor" placeholder="Nomor KK">
-      <input type="text" id="kk-kepala" placeholder="Nama Kepala Keluarga">
-      <input type="number" id="kk-jumlah" placeholder="Jumlah Anggota Keluarga">
-      <input type="text" id="kk-alamat" placeholder="Alamat">
+      
+      <label>Nomor KK</label>
+      <input type="text" id="kk-nomor" placeholder="Masukkan nomor KK">
+      
+      <label>Nama Kepala Keluarga</label>
+      <input type="text" id="kk-kepala" placeholder="Masukkan nama kepala keluarga">
+      
+      <label>Jumlah Anggota Keluarga</label>
+      <input type="number" id="kk-jumlah" placeholder="Masukkan jumlah anggota">
+      
+      <label>Alamat</label>
+      <input type="text" id="kk-alamat" placeholder="Masukkan alamat">
+      
       <div class="modal-actions">
         <button class="btn-secondary" onclick="closeModal('modal-kk')">Batal</button>
         <button class="btn-primary" onclick="simpanKK()">Simpan</button>
