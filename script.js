@@ -72,7 +72,8 @@ function login() {
     { username: 'bendahara09@rt09karangrejo.co.id', password: 'sri123', nama: 'Sri Ubayati' },
     { username: 'muhammadjirhan@rt09karangrejo.co.id', password: 'jirhan123', nama: 'Muhammad Jirhan' },
     { username: 'sekretaris09@rt09karangrejo.co.id', password: 'widodo123', nama: 'Widodo' },
-    { username: 'admin', password: 'admin123', nama: 'Admin RT' }
+ // CONTOH AKUN WARGA (Hanya bisa akses Home, Dashboard, Laporan, Surat)
+    { username: 'sarminiwarga@rt09karangrejo.co.id', password: 'sarmini123', nama: 'Sarmini' } 
   ];
 
   const akunDitemukan = daftarAkun.find(akun => akun.username === user && akun.password === pass);
@@ -80,6 +81,10 @@ function login() {
   if (akunDitemukan) {
     sessionStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('namaUser', akunDitemukan.nama); 
+        // Munculkan kembali semua menu sebelum dicek ulang di showDashboard
+    document.querySelectorAll('.sidebar .menu li').forEach(menu => {
+      menu.style.display = 'flex';
+    });
     showDashboard();
   } else {
     if(alertBox) {
@@ -110,14 +115,42 @@ function showDashboard() {
   if(greetingEl) {
     greetingEl.innerText = `Halo, ${namaUser}`;
   }
+ // ==========================================
+  // LOGIKA PEMBATASAN AKSES MENU (ROLE)
+  // ==========================================
+  const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
+  const sidebarMenus = document.querySelectorAll('.sidebar .menu li');
 
-  renderTable();
+  if (!adminPenuh.includes(namaUser)) {
+    // Jika yang login BUKAN admin, sembunyikan menu khusus admin
+    // Daftar menu yang disembunyikan: Data Warga, Data KK, Iuran, Pengumuman
+    const menuTerlarang = ['warga', 'kk', 'iuran', 'pengumuman'];
+    
+    sidebarMenus.forEach(menu => {
+      const pageName = menu.getAttribute('data-page');
+      if (menuTerlarang.includes(pageName)) {
+        menu.style.display = 'none'; // Sembunyikan menu
+      }
+    });
+
+    // Sembunyikan juga kategori "MASTER INPUT DATA" dan "FORM & INFORMATION" jika kosong
+    // (Opsional: Anda bisa biarkan saja judul kategorinya)
+  } else {
+    // Jika yang login adalah Admin, pastikan semua menu tampil
+    sidebarMenus.forEach(menu => {
+      menu.style.display = 'flex'; // Tampilkan semua menu
+    });
+  }
+  // ==========================================
+
+  renderWarga(); 
   renderKK(); 
   renderIuran(); 
   renderPengumuman(); 
   renderCharts();
   renderHomeSurat();
   
+  // Buka menu home secara otomatis
   const homeMenu = document.querySelector('[data-page="home"]');
   if(homeMenu) homeMenu.click();
 }
