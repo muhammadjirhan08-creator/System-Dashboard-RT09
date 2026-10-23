@@ -60,43 +60,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 function login() {
-  const user = document.getElementById('username').value;
-  const pass = document.getElementById('password').value;
+  const email = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
   const alertBox = document.getElementById('alert-error');
   
   if(alertBox) alertBox.style.display = 'none';
 
-  const daftarAkun = [
-    { username: 'ketua09@rt09karangrejo.co.id', password: 'wagimin123', nama: 'Wagimin' },
-    { username: 'kader09@rt09karangrejo.co.id', password: 'saikem123', nama: 'Saikem' },
-    { username: 'bendahara09@rt09karangrejo.co.id', password: 'sri123', nama: 'Sri Ubayati' },
-    { username: 'muhammadjirhan@rt09karangrejo.co.id', password: 'jirhan123', nama: 'Muhammad Jirhan' },
-    { username: 'sekretaris09@rt09karangrejo.co.id', password: 'widodo123', nama: 'Widodo' },
- // CONTOH AKUN WARGA (Hanya bisa akses Home, Dashboard, Laporan, Surat)
-    { username: 'sarminiwarga@rt09karangrejo.co.id', password: 'sarmini123', nama: 'Sarmini' } 
-  ];
-
-  const akunDitemukan = daftarAkun.find(akun => akun.username === user && akun.password === pass);
-
-  if (akunDitemukan) {
-    sessionStorage.setItem('isLoggedIn', 'true');
-    sessionStorage.setItem('namaUser', akunDitemukan.nama); 
-        // Munculkan kembali semua menu sebelum dicek ulang di showDashboard
-    document.querySelectorAll('.sidebar .menu li').forEach(menu => {
-      menu.style.display = 'flex';
-    });
-    showDashboard();
-  } else {
-    if(alertBox) {
-      alertBox.style.display = 'flex';
-      const userAda = daftarAkun.find(akun => akun.username === user);
-      if (userAda) {
-        document.getElementById('alert-text').innerText = 'Password yang Anda masukkan salah!';
-      } else {
-        document.getElementById('alert-text').innerText = 'Username atau Password salah!';
+  // Login menggunakan Firebase Authentication
+  window.fbSignIn(window.fbAuth, email, password)
+    .then((userCredential) => {
+      sessionStorage.setItem('isLoggedIn', 'true');
+      
+      let namaUser = "Admin RT"; 
+      if(email.includes('ketua')) namaUser = "Wagimin";
+      if(email.includes('kader')) namaUser = "Saikem";
+      if(email.includes('bendahara')) namaUser = "Sri Ubayati";
+      if(email.includes('sekretaris')) namaUser = "Widodo";
+      if(email.includes('warga')) namaUser = "Warga";
+      
+      sessionStorage.setItem('namaUser', namaUser); 
+      showDashboard();
+    })
+    .catch((error) => {
+      if(alertBox) {
+        alertBox.style.display = 'flex';
+        document.getElementById('alert-text').innerText = 'Email atau Password salah!';
       }
-    }
-  }
+    });
 }
 
 function logout() {
@@ -119,7 +109,8 @@ function showDashboard() {
   if(greetingEl) {
     greetingEl.innerText = `Halo, ${namaUser}`;
   }
- // ==========================================
+
+  // ==========================================
   // LOGIKA PEMBATASAN AKSES MENU (ROLE)
   // ==========================================
   const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
@@ -127,25 +118,20 @@ function showDashboard() {
 
   if (!adminPenuh.includes(namaUser)) {
     // Jika yang login BUKAN admin, sembunyikan menu khusus admin
-    // Daftar menu yang disembunyikan: Data Warga, Data KK, Iuran, Pengumuman
     const menuTerlarang = ['warga', 'kk', 'iuran', 'pengumuman'];
     
     sidebarMenus.forEach(menu => {
       const pageName = menu.getAttribute('data-page');
       if (menuTerlarang.includes(pageName)) {
-        menu.style.display = 'none'; // Sembunyikan menu
+        menu.style.display = 'none'; 
       }
     });
-
-    // Sembunyikan juga kategori "MASTER INPUT DATA" dan "FORM & INFORMATION" jika kosong
-    // (Opsional: Anda bisa biarkan saja judul kategorinya)
   } else {
     // Jika yang login adalah Admin, pastikan semua menu tampil
     sidebarMenus.forEach(menu => {
-      menu.style.display = 'flex'; // Tampilkan semua menu
+      menu.style.display = 'flex'; 
     });
   }
-  // ==========================================
 
   renderWarga(); 
   renderKK(); 
@@ -154,11 +140,9 @@ function showDashboard() {
   renderCharts();
   renderHomeSurat();
   
-  // Buka menu home secara otomatis
   const homeMenu = document.querySelector('[data-page="home"]');
   if(homeMenu) homeMenu.click();
 }
-
 // =======================================================
 // 2. DATA (localStorage)
 // =======================================================
