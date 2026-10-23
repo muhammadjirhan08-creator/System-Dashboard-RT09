@@ -163,23 +163,25 @@ function renderWarga() {
       const w = doc.data();
       dataWarga.push(w);
       
-      // PENTING: Simpan ID dokumen ke dalam variabel
-      const idDokumen = doc.id; 
+      // SIMPAN ID DOKUMEN KE DALAM VARIABEL
+      const idWarga = doc.id; 
 
-      // PERHATIKAN TANDA KUTIP TUNGGAL ('...') DI DALAM onclick
       tbody.innerHTML += `
         <tr>
           <td>${index++}</td>
           <td style="white-space: nowrap;">
-            <button class="btn-secondary" onclick="lihatWarga('${idDokumen}')" style="margin-right: 5px; background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Lihat"><i class="fas fa-eye"></i></button>
+            <!-- Tombol Lihat (Mata) -->
+            <button class="btn-secondary" onclick="lihatWarga('${idWarga}')" style="margin-right: 5px; background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Lihat"><i class="fas fa-eye"></i></button>
             
-            <button class="btn-secondary" onclick="openEditWarga('${idDokumen}')" style="margin-right: 5px; background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Edit"><i class="fas fa-edit"></i></button>
+            <!-- Tombol Edit (Pensil) -->
+            <button class="btn-secondary" onclick="openEditWarga('${idWarga}')" style="margin-right: 5px; background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Edit"><i class="fas fa-edit"></i></button>
             
-            <button class="btn-secondary" onclick="hapusWarga('${idDokumen}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
+            <!-- Tombol Hapus (Sampah) -->
+            <button class="btn-secondary" onclick="hapusWarga('${idWarga}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
           </td>
           <td>${w.nama || '-'}</td>
           <td>${w.nik || '-'}</td>
-          <td>${w.noKK || '-'}</td>
+          <td>${w.noKtp || '-'}</td>
           <td>${w.jk === 'L' ? 'Laki-laki' : (w.jk === 'P' ? 'Perempuan' : '-')}</td>
           <td>${w.pekerjaan || '-'}</td>
           <td>${w.alamat || '-'}</td>
@@ -1210,11 +1212,9 @@ async function updateStatusSurat(idDokumen, statusBaru) {
 }
 // ============ FUNGSI LIHAT WARGA ============
 async function lihatWarga(idDokumen) {
-  // Pastikan idDokumen tidak kosong
   if (!idDokumen || idDokumen === 'undefined') {
     return alert('ID Dokumen tidak valid.');
   }
-
   try {
     const { getDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
     const docRef = window.fbDoc(window.firebaseDB, "warga", idDokumen);
@@ -1224,7 +1224,7 @@ async function lihatWarga(idDokumen) {
       const w = docSnap.data();
       document.getElementById('lihat-nama').innerText = w.nama || '-';
       document.getElementById('lihat-nik').innerText = w.nik || '-';
-      document.getElementById('lihat-kk').innerText = w.noKK || '-';
+      document.getElementById('lihat-kk').innerText = w.noKtp || '-';
       document.getElementById('lihat-jk').innerText = w.jk === 'L' ? 'Laki-laki' : 'Perempuan';
       document.getElementById('lihat-pekerjaan').innerText = w.pekerjaan || '-';
       document.getElementById('lihat-alamat').innerText = w.alamat || '-';
@@ -1233,7 +1233,32 @@ async function lihatWarga(idDokumen) {
     }
   } catch (error) {
     console.error("Error lihat: ", error);
-    alert("Gagal mengambil data: " + error.message);
+  }
+}
+
+async function openEditWarga(idDokumen) {
+  if (!idDokumen || idDokumen === 'undefined') {
+    return alert('ID Dokumen tidak valid.');
+  }
+  try {
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    const docRef = window.fbDoc(window.firebaseDB, "warga", idDokumen);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const w = docSnap.data();
+      document.getElementById('edit-w-id').value = idDokumen;
+      document.getElementById('edit-w-nama').value = w.nama || '';
+      document.getElementById('edit-w-nik').value = w.nik || '';
+      document.getElementById('edit-w-kk').value = w.noKtp || '';
+      document.getElementById('edit-w-jk').value = w.jk || 'L';
+      document.getElementById('edit-w-pekerjaan').value = w.pekerjaan || '';
+      document.getElementById('edit-w-alamat').value = w.alamat || '';
+      document.getElementById('edit-w-status').value = w.status || 'Tetap';
+      document.getElementById('modal-edit-warga').classList.add('active');
+    }
+  } catch (error) {
+    console.error("Error edit: ", error);
   }
 }
 
