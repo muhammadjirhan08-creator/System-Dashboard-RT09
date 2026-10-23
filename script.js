@@ -109,7 +109,12 @@ function showDashboard() {
   if(greetingEl) {
     greetingEl.innerText = `Halo, ${namaUser}`;
   }
-
+function renderWarga() {
+  const tbody = document.querySelector('#table-warga tbody');
+  if (!tbody) return; 
+  tbody.innerHTML = '';
+  
+}
   // ==========================================
   // LOGIKA PEMBATASAN AKSES MENU (ROLE)
   // ==========================================
