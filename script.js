@@ -110,12 +110,7 @@ function showDashboard() {
   if(greetingEl) {
     greetingEl.innerText = `Halo, ${namaUser}`;
   }
-function renderWarga() {
-  const tbody = document.querySelector('#table-warga tbody');
-  if (!tbody) return; 
-  tbody.innerHTML = '';
-  
-}
+
   // ==========================================
   // LOGIKA PEMBATASAN AKSES MENU (ROLE)
   // ==========================================
@@ -123,7 +118,6 @@ function renderWarga() {
   const sidebarMenus = document.querySelectorAll('.sidebar .menu li');
 
   if (!adminPenuh.includes(namaUser)) {
-    // Jika yang login BUKAN admin, sembunyikan menu khusus admin
     const menuTerlarang = ['warga', 'kk', 'iuran', 'pengumuman'];
     
     sidebarMenus.forEach(menu => {
@@ -133,21 +127,28 @@ function renderWarga() {
       }
     });
   } else {
-    // Jika yang login adalah Admin, pastikan semua menu tampil
     sidebarMenus.forEach(menu => {
       menu.style.display = 'flex'; 
     });
   }
 
+  // PANGGIL SEMUA FUNGSI RENDER
   renderWarga(); 
   renderKK(); 
   renderIuran(); 
   renderPengumuman(); 
   renderCharts();
-  renderHomeSurat();
+  renderHomeSurat(); // <--- INI AKAN TERPANGGIL SEKARANG
   
   const homeMenu = document.querySelector('[data-page="home"]');
   if(homeMenu) homeMenu.click();
+}
+function renderWarga() {
+  const tbody = document.querySelector('#table-warga tbody');
+  if (!tbody) return; 
+  tbody.innerHTML = '';
+  
+  // (Isi logika render warga Anda di sini, atau biarkan kosong jika belum dipakai)
 }
 // =======================================================
 // 2. DATA (localStorage)
