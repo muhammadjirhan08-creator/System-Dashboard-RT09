@@ -538,18 +538,42 @@ function renderPengumuman() {
   });
 }
 
-function simpanPengumuman() {
+async function simpanPengumuman() {
   const judul = document.getElementById('p-judul').value.trim();
   const isi = document.getElementById('p-isi').value.trim();
+  
   if (!judul || !isi) return alert('Judul dan Isi Pengumuman tidak boleh kosong!');
+  
   const tanggal = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
-  dataPengumuman.unshift({ judul, isi, tanggal });
-  renderPengumuman(); closeModal('modal-pengumuman');
-  document.getElementById('p-judul').value = ''; document.getElementById('p-isi').value = '';
+  
+  try {
+    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "pengumuman"), {
+      judul: judul,
+      isi: isi,
+      tanggal: tanggal
+    });
+    
+    alert('Pengumuman berhasil ditambahkan!');
+    closeModal('modal-pengumuman');
+    
+    document.getElementById('p-judul').value = '';
+    document.getElementById('p-isi').value = '';
+    
+  } catch (error) {
+    console.error("Error simpan pengumuman: ", error);
+    alert('Gagal menyimpan pengumuman. Periksa koneksi internet.');
+  }
 }
-
-function hapusPengumuman(index) {
-  if (confirm('Hapus pengumuman ini?')) { dataPengumuman.splice(index, 1); renderPengumuman(); }
+async function hapusPengumuman(idDokumen) {
+  if (confirm('Hapus pengumuman ini?')) {
+    try {
+      await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "pengumuman", idDokumen));
+      alert('Pengumuman berhasil dihapus!');
+    } catch (error) {
+      console.error("Error hapus: ", error);
+      alert("Gagal menghapus pengumuman.");
+    }
+  }
 }
 
 // =======================================================
