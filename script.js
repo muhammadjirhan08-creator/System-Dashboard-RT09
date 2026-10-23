@@ -173,7 +173,7 @@ function renderWarga() {
             <button class="btn-secondary" onclick="lihatWarga('${doc.id}')" style="margin-right: 5px; background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Lihat Detail"><i class="fas fa-eye"></i></button>
             
             <!-- Tombol Edit (Ikon Pensil) -->
-            <button class="btn-secondary" onclick="openEditWarga('${doc.id}')" style="margin-right: 5px; background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Edit"><i class="fas fa-edit"></i></button>
+           <button class="btn-secondary" onclick="openEditWarga('${doc.id}')" style="margin-right: 5px; background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Edit"><i class="fas fa-edit"></i></button>
             
             <!-- Tombol Hapus (Ikon Tempat Sampah) -->
             <button class="btn-secondary" onclick="hapusWarga('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
