@@ -159,28 +159,44 @@ function renderWarga() {
       return;
     }
 
-   let index = 1;
+       let index = 1;
     snapshot.forEach((doc) => {
       const w = doc.data();
       dataWarga.push(w);
 
-      // Urutan <td> disesuaikan dengan urutan <th> di HTML
       tbody.innerHTML += `
         <tr>
+          <!-- 1. Kolom NO -->
           <td>${index++}</td>
-                   <td style="white-space: nowrap;">
+          
+          <!-- 2. Kolom ACTION (Tombol diletakkan di sini) -->
+          <td style="white-space: nowrap;">
             <button class="btn-secondary" onclick="lihatWarga('${doc.id}')" style="margin-right: 5px; background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Lihat Detail"><i class="fas fa-eye"></i></button>
             
             <button class="btn-secondary" onclick="openEditWarga('${doc.id}')" style="margin-right: 5px; background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Edit"><i class="fas fa-edit"></i></button>
             
             <button class="btn-secondary" onclick="hapusWarga('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
           </td>
+
+          <!-- 3. Kolom NAMA -->
           <td>${w.nama || '-'}</td>
+          
+          <!-- 4. Kolom NIK -->
           <td>${w.nik || '-'}</td>
+          
+          <!-- 5. Kolom NO. KK -->
           <td>${w.noKtp || '-'}</td>
+          
+          <!-- 6. Kolom JENIS KELAMIN -->
           <td>${w.jk || '-'}</td>
+          
+          <!-- 7. Kolom PEKERJAAN -->
           <td>${w.pekerjaan || '-'}</td>
+          
+          <!-- 8. Kolom ALAMAT -->
           <td>${w.alamat || '-'}</td>
+          
+          <!-- 9. Kolom STATUS -->
           <td><span class="badge ${w.status === 'Tetap' ? 'badge-success' : 'badge-danger'}">${w.status || '-'}</span></td>
         </tr>`;
     });
