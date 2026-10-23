@@ -680,7 +680,6 @@ function renderSurat() {
   const tbody = document.querySelector('#table-surat tbody');
   if(!tbody) return;
   
-  // Dengarkan data secara real-time dari Firebase
   window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "surat"), (snapshot) => {
     tbody.innerHTML = '';
     
@@ -689,9 +688,28 @@ function renderSurat() {
       return;
     }
 
+    // Ambil nama user yang sedang login dari session storage
+    const namaUserAktif = sessionStorage.getItem('namaUser') || '';
+    const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
+    const isAdmin = adminPenuh.includes(namaUserAktif);
+
     let index = 1;
     snapshot.forEach((doc) => {
       const s = doc.data();
+      
+      // === LOGIKA TOMBOL AKSI ===
+      let tombolAksi = `
+        <button class="btn-secondary" onclick="downloadSuratPDF('${doc.id}')" style="margin-right: 5px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Download PDF"><i class="fas fa-download"></i></button>
+        <button class="btn-secondary" onclick="printSuratDariFirebase('${doc.id}')" style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Print"><i class="fas fa-print"></i></button>
+      `;
+
+      // Jika yang login adalah Admin, tambahkan tombol Edit (meskipun saat ini belum ada fungsi edit surat) dan Hapus
+      if (isAdmin) {
+        tombolAksi += `
+          <button class="btn-secondary" onclick="hapusSuratDariList('${doc.id}')" style="margin-left: 5px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
+        `;
+      }
+
       tbody.innerHTML += `
         <tr>
           <td>${index++}</td>
@@ -700,8 +718,7 @@ function renderSurat() {
           <td>${s.nik}</td>
           <td>${s.keperluan}</td>
           <td style="white-space: nowrap;">
-            <button class="btn-secondary" onclick="downloadSuratPDF('${doc.id}')" style="margin-right: 5px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Download PDF"><i class="fas fa-download"></i></button>
-            <button class="btn-secondary" onclick="hapusSuratDariList('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
+            ${tombolAksi}
           </td>
         </tr>`;
     });
@@ -1090,4 +1107,38 @@ function bukaPoster() {
 function tutupPoster() {
   // Sembunyikan modal
   document.getElementById('modal-poster').classList.remove('active');
+}
+async function printSuratDariFirebase(idDokumen) {
+  try {
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    const docRef = window.fbDoc(window.firebaseDB, "surat", idDokumen);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const s = docSnap.data();
+      
+      // Isi template surat
+      document.getElementById('hasil-nama').innerText = s.nama;
+      document.getElementById('hasil-nik').innerText = s.nik;
+      document.getElementById('hasil-alamat').innerText = s.alamat;
+      document.getElementById('hasil-keperluan').innerText = s.keperluan;
+      document.getElementById('tgl-surat').innerText = s.tanggal;
+
+      // Sembunyikan form, munculkan preview
+      document.getElementById('form-input-surat').style.display = 'none';
+      document.getElementById('preview-surat').style.display = 'block';
+      
+      // Panggil fungsi print yang sudah ada
+      printSurat();
+      
+      // Kembalikan tampilan setelah print
+      setTimeout(() => {
+        document.getElementById('form-input-surat').style.display = 'block';
+        document.getElementById('preview-surat').style.display = 'none';
+      }, 1000);
+    }
+  } catch (error) {
+    console.error("Error print: ", error);
+    alert("Gagal mencetak surat.");
+  }
 }
