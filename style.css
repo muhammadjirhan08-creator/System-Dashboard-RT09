@@ -245,13 +245,26 @@ button.btn-login:hover {
 
 /* ================= TABEL ================= */
 .table {
-  width: 100%; border-collapse: collapse; background: #fff;
-  border-radius: 12px; overflow: hidden;
+  width: 100%; 
+  border-collapse: collapse; 
+  background: #fff;
+  border-radius: 12px; 
+  overflow: hidden;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  
+  /* TAMBAHKAN KODE INI UNTUK MERAPIKAN KOLOM */
+  table-layout: auto; 
+  word-wrap: break-word;
 }
+
+/* Pastikan padding di dalam tabel tetap ada */
 .table th, .table td {
-  padding: 12px 15px; text-align: left; font-size: 14px;
+  padding: 12px 15px; 
+  text-align: left; 
+  font-size: 14px;
   border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle; /* Agar teks sejajar ke tengah secara vertikal */
+}
 }
 .table th { background: #f8fafc; color: #475569; font-weight: 600; }
 .table tr:hover { background: #f8fafc; }
