@@ -598,9 +598,11 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
    <!-- ================= FIREBASE SDK ================= -->
-  <script type="module">
+    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+    // Impor modul Authentication
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
 
     // Konfigurasi Firebase Anda
     const firebaseConfig = {
@@ -616,6 +618,7 @@
     // Inisialisasi Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app); // Inisialisasi Auth
 
     // Ekspos fungsi Firebase ke window agar bisa dipakai di script.js
     window.firebaseDB = db;
@@ -624,6 +627,12 @@
     window.fbOnSnapshot = onSnapshot;
     window.fbDoc = doc;
     window.fbDeleteDoc = deleteDoc;
+    
+    // Ekspos fungsi Auth ke window
+    window.fbAuth = auth;
+    window.fbSignIn = signInWithEmailAndPassword;
+    window.fbSignOut = signOut;
+    window.fbOnAuthStateChanged = onAuthStateChanged;
   </script>
 
   <!-- Script Utama Anda -->

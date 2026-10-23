@@ -101,8 +101,12 @@ function login() {
 
 function logout() {
   if (confirm('Yakin ingin keluar?')) {
-    sessionStorage.removeItem('isLoggedIn');
-    location.reload(); 
+    window.fbSignOut(window.fbAuth).then(() => {
+      sessionStorage.removeItem('isLoggedIn');
+      location.reload(); 
+    }).catch((error) => {
+      console.error('Gagal logout:', error);
+    });
   }
 }
 
