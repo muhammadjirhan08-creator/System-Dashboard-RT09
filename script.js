@@ -73,6 +73,7 @@ function login() {
       
       let namaUser = "Admin RT"; 
       if(email.includes('ketua')) namaUser = "Wagimin";
+      if(email.includes('jirhan')) namaUser = "Muhammad Jirhan";
       if(email.includes('kader')) namaUser = "Saikem";
       if(email.includes('bendahara')) namaUser = "Sri Ubayati";
       if(email.includes('sekretaris')) namaUser = "Widodo";
