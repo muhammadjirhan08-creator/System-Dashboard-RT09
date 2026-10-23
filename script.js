@@ -146,35 +146,51 @@ function showDashboard() {
 function renderWarga() {
   const tbody = document.querySelector('#table-warga tbody');
   if (!tbody) return; 
-  tbody.innerHTML = '';
-  
-  // (Isi logika render warga Anda di sini, atau biarkan kosong jika belum dipakai)
+
+  // Mengambil data langsung dari Firebase
+  window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "warga"), (snapshot) => {
+    tbody.innerHTML = '';
+    dataWarga = []; 
+    
+    if (snapshot.empty) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b;">Belum ada data warga.</td></tr>';
+      const elTotalWarga = document.getElementById('total-warga');
+      if (elTotalWarga) elTotalWarga.textContent = '0';
+      return;
+    }
+
+    let index = 1;
+    snapshot.forEach((doc) => {
+      const w = doc.data();
+      dataWarga.push(w);
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${index++}</td>
+          <td>${w.nama}</td>
+          <td>${w.nik || '-'}</td>
+          <td>${w.kk}</td>
+          <td>${w.alamat}</td>
+          <td><span class="badge ${w.status === 'Tetap' ? 'badge-success' : 'badge-danger'}">${w.status}</span></td>
+          <td>
+            <button class="btn-secondary" onclick="hapusWarga('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>`;
+    });
+    
+    // Update angka total warga di Dashboard
+    const elTotalWarga = document.getElementById('total-warga');
+    if (elTotalWarga) elTotalWarga.textContent = dataWarga.length;
+  });
 }
 // =======================================================
-// 2. DATA (localStorage)
+// 2. DATA (Akan diisi dari Firebase secara Real-time)
 // =======================================================
-let dataWarga = JSON.parse(localStorage.getItem('warga')) || [
-  { id: 1, nama: 'Budi Santoso', nik: '3201234567890001', noKtp: '6471012345670001', jk: 'L', pekerjaan: 'Karyawan Swasta', alamat: 'Jl. Melati No.1', status: 'Tetap' },
-  { id: 2, nama: 'Siti Aminah', nik: '3201234567890002', noKtp: '6471012345670002', jk: 'P', pekerjaan: 'Ibu Rumah Tangga', alamat: 'Jl. Melati No.2', status: 'Tetap' },
-  { id: 3, nama: 'Ahmad Fauzi', nik: '3201234567890003', noKtp: '6471012345670003', jk: 'L', pekerjaan: 'Wiraswasta', alamat: 'Jl. Mawar No.5', status: 'Kontrak' },
-];
-
-let dataKK = JSON.parse(localStorage.getItem('dataKK')) || [
-  { nomor: '3201234567890001', kepala: 'Budi Santoso', jumlah: '4', alamat: 'Jl. Melati No.1' },
-  { nomor: '3201234567890002', kepala: 'Siti Aminah', jumlah: '3', alamat: 'Jl. Melati No.2' }
-];
-
-let dataIuran = JSON.parse(localStorage.getItem('iuran')) || [
-  { nama: 'Budi Santoso', bulan: 'Januari 2025', jumlah: 50000, status: 'Lunas' },
-  { nama: 'Siti Aminah', bulan: 'Januari 2025', jumlah: 50000, status: 'Lunas' },
-  { nama: 'Ahmad Fauzi', bulan: 'Januari 2025', jumlah: 50000, status: 'Belum' },
-];
-
-let dataPengumuman = JSON.parse(localStorage.getItem('pengumuman')) || [
-  { judul: 'Kerja Bakti', isi: 'Kerja bakti akan dilaksanakan hari Minggu pukul 07.00 WIB.', tanggal: '2025-01-10' }
-];
-
-let dataSurat = JSON.parse(localStorage.getItem('dataSurat')) || [];
+let dataWarga = [];
+let dataKK = [];
+let dataIuran = [];
+let dataPengumuman = [];
+let dataSurat = []; 
 
 // =======================================================
 // 3. NAVIGASI MENU SIDEBAR (SATU-SATUNYA)
@@ -261,35 +277,42 @@ function renderTable() {
 }
 
 // B. SIMPAN WARGA BARU
-function simpanWarga() {
+async function simpanWarga() {
   const nama = document.getElementById('w-nama').value.trim(); 
   const nik = document.getElementById('w-nik').value.trim(); 
-  // Pastikan ID di HTML modal Anda adalah 'w-kk'
-  const noKtp = document.getElementById('w-kk').value.trim(); 
+  const noKtp = document.getElementById('w-kk').value.trim(); // Sesuaikan ID jika berbeda
   const jk = document.getElementById('w-jk').value;
   const pekerjaan = document.getElementById('w-pekerjaan').value.trim();
   const alamat = document.getElementById('w-alamat').value.trim();
   const status = document.getElementById('w-status').value;
   
   if (!nama || !nik || !alamat) return alert('Lengkapi data wajib (Nama, NIK, dan Alamat)!');
-  
-  const newId = Date.now();
-  
-  // Simpan data dengan properti noKtp
-  dataWarga.push({ id: newId, nama, nik, noKtp, jk, pekerjaan, alamat, status });
-  
-  localStorage.setItem('warga', JSON.stringify(dataWarga));
-  renderTable();
-  
-  // PERBAIKAN: Tutup modal yang benar (modal-warga, bukan modal-edit-warga)
-  closeModal('modal-warga');
-  
-  // Reset Form
-  document.getElementById('w-nama').value = '';
-  document.getElementById('w-nik').value = '';
-  document.getElementById('w-kk').value = ''; 
-  document.getElementById('w-pekerjaan').value = '';
-  document.getElementById('w-alamat').value = '';
+
+  try {
+    // Simpan ke Firebase (semua data dimasukkan)
+    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "warga"), {
+      nama: nama,
+      nik: nik,
+      noKtp: noKtp,
+      jk: jk,
+      pekerjaan: pekerjaan,
+      alamat: alamat,
+      status: status
+    });
+    
+    alert('Data warga berhasil ditambahkan!');
+    closeModal('modal-warga');
+    
+    // Reset Form
+    document.getElementById('w-nama').value = '';
+    document.getElementById('w-nik').value = '';
+    document.getElementById('w-kk').value = ''; 
+    document.getElementById('w-pekerjaan').value = '';
+    document.getElementById('w-alamat').value = '';
+  } catch (error) {
+    console.error("Error: ", error);
+    alert('Gagal menyimpan data. Periksa koneksi internet.');
+  }
 }
 
 // C. BUKA MODAL EDIT WARGA
