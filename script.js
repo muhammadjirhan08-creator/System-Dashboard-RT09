@@ -554,7 +554,7 @@ function renderPengumuman() {
         let linkGambarWA = '';
         if (p.gambar) {
           gambarHTML = `<img src="${p.gambar}" alt="Gambar Pengumuman" style="max-width: 100%; max-height: 250px; border-radius: 8px; margin-top: 10px; margin-bottom: 10px; display: block;">`;
-          linkGambarWA = `\n\n[Klik di sini untuk melihat Poster Pengumuman](${p.gambar})`;
+          Klik_di_sini_untuk_melihat_Poster_Pengumuman = `\n\n${p.gambar}`;
         }
 
         // Pesan WhatsApp
@@ -611,7 +611,7 @@ function renderPengumuman() {
           let linkGambarWAHome = '';
           if (p.gambar) {
             gambarHTMLHome = `<img src="${p.gambar}" alt="Gambar" style="max-width: 100%; max-height: 150px; border-radius: 6px; margin-top: 8px; display: block;">`;
-            linkGambarWAHome = `\n\n[Lihat Gambar](${p.gambar})`;
+            linkGambarWAHome = `\n\n${p.gambar}`;
           }
 
           let tombolWAHome = '';
