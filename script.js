@@ -549,7 +549,16 @@ function renderPengumuman() {
       snapshot.forEach((doc) => {
         const p = doc.data();
         
-        const pesanWA = encodeURIComponent(`*PENGUMUMAN RT 09 KARANG REJO*\n\n*Judul:* ${p.judul}\n*Tanggal:* ${p.tanggal}\n\n${p.isi}\n\n_— Sistem Informasi RT 09_`);
+        // 1. TAMBAHKAN LOGIKA GAMBAR DI SINI
+        let gambarHTML = '';
+        let linkGambarWA = '';
+        if (p.gambar) {
+          gambarHTML = `<img src="${p.gambar}" alt="Gambar Pengumuman" style="max-width: 100%; max-height: 250px; border-radius: 8px; margin-top: 10px; margin-bottom: 10px; display: block;">`;
+          linkGambarWA = `\n\n[Lihat Gambar](${p.gambar})`; // Link gambar untuk WhatsApp
+        }
+
+        // 2. Pesan WhatsApp (Tambahkan linkGambarWA)
+        const pesanWA = encodeURIComponent(`*PENGUMUMAN RT 09 KARANG REJO*\n\n*Judul:* ${p.judul}\n*Tanggal:* ${p.tanggal}\n\n${p.isi}${linkGambarWA}\n\n_— Sistem Informasi RT 09_`);
         const linkWA = `https://wa.me/?text=${pesanWA}`;
 
         // Tombol WA hanya dibuat jika Admin
@@ -564,10 +573,12 @@ function renderPengumuman() {
           tombolHapus = `<button class="btn-secondary" onclick="hapusPengumuman('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>`;
         }
 
+        // 3. Tampilkan gambarHTML di dalam list.innerHTML
         list.innerHTML += `
           <div class="pengumuman-item" style="position: relative;">
             <h4>${p.judul}</h4>
             <p>${p.isi}</p>
+            ${gambarHTML} <!-- GAMBAR MUNCUL DI SINI -->
             <small>📅 ${p.tanggal}</small>
             
             <div style="position: absolute; top: 15px; right: 15px; display: flex; gap: 5px;">
@@ -591,23 +602,33 @@ function renderPengumuman() {
         return;
       }
       
-      let count = 0;
+            let count = 0;
       snapshot.forEach((doc) => {
         if (count < 3) {
           const p = doc.data();
           
-          // Tombol WA di Home hanya untuk Admin
-          let tombolWAHome = '';
-          if (isAdmin) {
-            tombolWAHome = `<a href="https://wa.me/?text=${encodeURIComponent(`*PENGUMUMAN RT 09*\n\n*${p.judul}*\n${p.isi}\n\n_— RT 09 Karang Rejo_`)}" target="_blank" style="position: absolute; top: 15px; right: 15px; color: #25D366; font-size: 20px;" title="Bagikan ke WhatsApp"><i class="fab fa-whatsapp"></i></a>`;
+          // 1. Logika Gambar untuk Home
+          let gambarHTMLHome = '';
+          let linkGambarWAHome = '';
+          if (p.gambar) {
+            gambarHTMLHome = `<img src="${p.gambar}" alt="Gambar" style="max-width: 100%; max-height: 150px; border-radius: 6px; margin-top: 8px; display: block;">`;
+            linkGambarWAHome = `\n\n[Lihat Gambar](${p.gambar})`;
           }
 
+          // 2. Tombol WA di Home (Tambahkan link gambar ke pesan WA)
+          let tombolWAHome = '';
+          if (isAdmin) {
+            tombolWAHome = `<a href="https://wa.me/?text=${encodeURIComponent(`*PENGUMUMAN RT 09*\n\n*${p.judul}*\n${p.isi}${linkGambarWAHome}\n\n_— RT 09 Karang Rejo_`)}" target="_blank" style="position: absolute; top: 15px; right: 15px; color: #25D366; font-size: 20px;" title="Bagikan ke WhatsApp"><i class="fab fa-whatsapp"></i></a>`;
+          }
+
+          // 3. Tampilkan di Home (Tambahkan gambarHTMLHome)
           homeList.innerHTML += `
             <div class="list-item" style="position: relative;">
               <div class="list-icon green"><i class="fas fa-bullhorn"></i></div>
               <div class="list-content">
                 <h4>${p.judul}</h4>
                 <p>${p.isi}</p>
+                ${gambarHTMLHome} <!-- GAMBAR DI HOME -->
                 <small>📅 ${p.tanggal}</small>
               </div>
               ${tombolWAHome}
