@@ -554,7 +554,7 @@ function renderPengumuman() {
         let linkGambarWA = '';
         if (p.gambar) {
           gambarHTML = `<img src="${p.gambar}" alt="Gambar Pengumuman" style="max-width: 100%; max-height: 250px; border-radius: 8px; margin-top: 10px; margin-bottom: 10px; display: block;">`;
-          linkGambarWA = `\n\n[Lihat Gambar](${p.gambar})`;
+          linkGambarWA = `\n\n[Klik di sini untuk melihat Poster Pengumuman](${p.gambar})`;
         }
 
         // Pesan WhatsApp
