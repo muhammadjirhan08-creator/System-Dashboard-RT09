@@ -442,7 +442,6 @@ function renderIuran() {
 
   window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "iuran"), (snapshot) => {
     tbody.innerHTML = '';
-    dataIuran = [];
     let total = 0, belum = 0;
 
     if (snapshot.empty) {
@@ -455,9 +454,6 @@ function renderIuran() {
     let index = 1;
     snapshot.forEach((doc) => {
       const d = doc.data();
-      d.id = doc.id;
-      dataIuran.push(d);
-
       if (d.status === 'Lunas') total += Number(d.jumlah);
       else belum++;
 
@@ -468,9 +464,7 @@ function renderIuran() {
           <td>${d.bulan || '-'}</td>
           <td>Rp ${Number(d.jumlah).toLocaleString('id-ID')}</td>
           <td><span class="badge ${d.status === 'Lunas' ? 'badge-success' : 'badge-danger'}">${d.status || '-'}</span></td>
-          <td>
-            <button class="btn-secondary" onclick="hapusIuran('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;"><i class="fas fa-trash"></i></button>
-          </td>
+          <td><button class="btn-secondary" onclick="hapusIuran('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;"><i class="fas fa-trash"></i></button></td>
         </tr>`;
     });
 
@@ -1086,16 +1080,11 @@ async function simpanPengaduan() {
 
 function renderPengaduan() {
   const tbody = document.querySelector('#table-pengaduan tbody');
-  if(!tbody) return;
+  if(!tbody) return; // Pengaman jika tabel tidak ada
 
   const namaUserAktif = sessionStorage.getItem('namaUser') || '';
   const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
   const isAdmin = adminPenuh.includes(namaUserAktif);
-
-  const btnContainer = document.getElementById('form-pengaduan-container');
-  if (btnContainer) {
-    btnContainer.style.display = isAdmin ? 'block' : 'none';
-  }
 
   window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengaduan"), (snapshot) => {
     tbody.innerHTML = '';
@@ -1109,24 +1098,20 @@ function renderPengaduan() {
     snapshot.forEach((doc) => {
       const d = doc.data();
       
-      // Jika Warga, hanya tampilkan aduan miliknya sendiri
+      // Filter untuk Warga
       if (!isAdmin && d.pelapor !== namaUserAktif) return;
 
-      let badgeClass = 'badge-warning'; // Kuning untuk Menunggu
-      if (d.status === 'Diproses') badgeClass = 'badge-primary'; // Biru
-      if (d.status === 'Selesai') badgeClass = 'badge-success'; // Hijau
+      let badgeClass = 'badge-warning';
+      if (d.status === 'Diproses') badgeClass = 'badge-primary';
+      if (d.status === 'Selesai') badgeClass = 'badge-success';
 
-      // Tombol aksi (Admin vs Warga)
       let tombolAksi = '';
-      
       if (isAdmin) {
-        // Jika Admin: Tampilkan tombol Tanggapi dan Hapus
         tombolAksi = `
           <button class="btn-secondary" onclick="bukaTanggapi('${doc.id}')" style="margin-right: 5px; background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Tanggapi"><i class="fas fa-reply"></i></button>
           <button class="btn-secondary" onclick="hapusPengaduan('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
         `;
       } else {
-        // Jika Warga: Hanya tampilkan tombol Lihat Detail
         tombolAksi = `
           <button class="btn-secondary" onclick="lihatDetailPengaduan('${doc.id}')" style="background: #64748b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Lihat Detail"><i class="fas fa-eye"></i></button>
         `;
@@ -1135,10 +1120,10 @@ function renderPengaduan() {
       tbody.innerHTML += `
         <tr>
           <td>${index++}</td>
-          <td>${d.tanggal}</td>
-          <td>${d.judul}<br><small style="color:#64748b">Kategori: ${d.kategori}</small></td>
-          <td>${d.pelapor}</td>
-          <td><span class="badge ${badgeClass}">${d.status}</span></td>
+          <td>${d.tanggal || '-'}</td>
+          <td>${d.judul || '-'}<br><small style="color:#64748b">Kategori: ${d.kategori || '-'}</small></td>
+          <td>${d.pelapor || '-'}</td>
+          <td><span class="badge ${badgeClass}">${d.status || 'Menunggu'}</span></td>
           <td>${tombolAksi}</td>
         </tr>`;
     });
