@@ -648,20 +648,45 @@ async function simpanSuratBaru() {
 function renderSurat() {
   const tbody = document.querySelector('#table-surat tbody');
   if(!tbody) return;
+  
   window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "surat"), (snapshot) => {
     tbody.innerHTML = '';
-    if (snapshot.empty) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b;">Belum ada data surat.</td></tr>'; return; }
+    
+    if (snapshot.empty) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b;">Belum ada data surat.</td></tr>';
+      return;
+    }
+
     const namaUserAktif = sessionStorage.getItem('namaUser') || '';
     const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
-    const isAdminHome = adminPenuhHome.includes(namaUserAktifHome);
+    const isAdmin = adminPenuh.includes(namaUserAktif);
+
     let index = 1;
     snapshot.forEach((doc) => {
-        const p = doc.data();
-      let tombolAksi = `<button class="btn-secondary" onclick="downloadSuratPDF('${doc.id}')" style="margin-right: 5px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Download PDF"><i class="fas fa-download"></i></button><button class="btn-secondary" onclick="printSuratDariFirebase('${doc.id}')" style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Print"><i class="fas fa-print"></i></button>`;
+      const s = doc.data();
+      
+      let tombolAksi = `
+        <button class="btn-secondary" onclick="downloadSuratPDF('${doc.id}')" style="margin-right: 5px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Download PDF"><i class="fas fa-download"></i></button>
+        <button class="btn-secondary" onclick="printSuratDariFirebase('${doc.id}')" style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Print"><i class="fas fa-print"></i></button>
+      `;
+
       if (isAdmin) {
-        tombolAksi += `<button class="btn-secondary" onclick="updateStatusSurat('${doc.id}', 'Disetujui')" style="margin-left: 5px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Setujui"><i class="fas fa-check"></i></button><button class="btn-secondary" onclick="updateStatusSurat('${doc.id}', 'Ditolak')" style="margin-left: 5px; background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Tolak"><i class="fas fa-times"></i></button><button class="btn-secondary" onclick="hapusSuratDariList('${doc.id}')" style="margin-left: 5px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>`;
+        tombolAksi += `
+          <button class="btn-secondary" onclick="updateStatusSurat('${doc.id}', 'Disetujui')" style="margin-left: 5px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Setujui"><i class="fas fa-check"></i></button>
+          <button class="btn-secondary" onclick="updateStatusSurat('${doc.id}', 'Ditolak')" style="margin-left: 5px; background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Tolak"><i class="fas fa-times"></i></button>
+          <button class="btn-secondary" onclick="hapusSuratDariList('${doc.id}')" style="margin-left: 5px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
+        `;
       }
-      tbody.innerHTML += `<tr><td>${index++}</td><td>${p.tanggal}</td><td>${p.nama}</td><td>${p.nik}</td><td>${p.keperluan}</td><td style="white-space: nowrap;">${tombolAksi}</td></tr>`;
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${index++}</td>
+          <td>${s.tanggal}</td>
+          <td>${s.nama}</td>
+          <td>${s.nik}</td>
+          <td>${s.keperluan}</td>
+          <td style="white-space: nowrap;">${tombolAksi}</td>
+        </tr>`;
     });
   });
 }
@@ -692,6 +717,10 @@ async function downloadSuratPDF(idDokumen) {
     if (docSnap.exists()) {
       const s = docSnap.data();
       document.getElementById('hasil-nama').innerText = s.nama; document.getElementById('hasil-nik').innerText = s.nik; document.getElementById('hasil-alamat').innerText = s.alamat; document.getElementById('hasil-keperluan').innerText = s.keperluan; document.getElementById('tgl-surat').innerText = s.tanggal;
+      document.getElementById('hasil-ttl').innerText = s.tempatLahir + ', ' + s.tanggalLahir;
+      document.getElementById('hasil-jk').innerText = s.jenisKelamin;
+      document.getElementById('hasil-agama').innerText = s.agama;
+      document.getElementById('hasil-pekerjaan').innerText = s.pekerjaan;
       const element = document.getElementById('isi-surat');
       html2pdf().set({ margin: 1, filename: `Surat_Pengantar_${s.nama.replace(/\s+/g, '_')}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(element).save();
     } else { alert("Data surat tidak ditemukan."); }
@@ -719,6 +748,10 @@ async function printSuratDariFirebase(idDokumen) {
     if (docSnap.exists()) {
       const s = docSnap.data();
       document.getElementById('hasil-nama').innerText = s.nama; document.getElementById('hasil-nik').innerText = s.nik; document.getElementById('hasil-alamat').innerText = s.alamat; document.getElementById('hasil-keperluan').innerText = s.keperluan; document.getElementById('tgl-surat').innerText = s.tanggal;
+      document.getElementById('hasil-ttl').innerText = s.tempatLahir + ', ' + s.tanggalLahir;
+      document.getElementById('hasil-jk').innerText = s.jenisKelamin;
+      document.getElementById('hasil-agama').innerText = s.agama;
+      document.getElementById('hasil-pekerjaan').innerText = s.pekerjaan;
       document.getElementById('form-input-surat').style.display = 'none'; document.getElementById('preview-surat').style.display = 'block';
       printSurat();
       setTimeout(() => { document.getElementById('form-input-surat').style.display = 'block'; document.getElementById('preview-surat').style.display = 'none'; }, 1000);
