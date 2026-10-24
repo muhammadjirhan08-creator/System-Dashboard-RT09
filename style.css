@@ -909,7 +909,7 @@ button.btn-login:hover {
 #toast-notification {
   visibility: hidden;
   min-width: 250px;
-  background-color: #10b981; /* Warna hijau sukses */
+  background-color: #1067b9; /* Warna biru sukses */
   color: #fff;
   text-align: left;
   border-radius: 8px;
