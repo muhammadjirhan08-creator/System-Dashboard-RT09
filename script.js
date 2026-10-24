@@ -735,17 +735,18 @@ function printSurat() {
   const printWindow = window.open('', '', 'height=800,width=800');
   
   printWindow.document.write('<html><head><title>Cetak Surat</title>');
+  
+  // KODE CSS YANG RAPI (Menggunakan backtick ` ` )
   printWindow.document.write(`
     <style>
-      /* Mengatur ukuran kertas dan margin */
       @page { 
         size: A4 portrait; 
-        margin: 10mm; /* Margin kertas sangat tipis (1cm) */
+        margin: 15mm; /* Margin kertas 1.5cm agar aman */
       }
       body { 
         font-family: 'Times New Roman', serif !important; 
-        font-size: 13px; /* Ukuran font diperkecil agar muat */
-        line-height: 1.3; /* Jarak antar baris dirapatkan */
+        font-size: 13px; 
+        line-height: 1.3; 
         background: #fff !important; 
         color: #000 !important; 
         margin: 0;
@@ -766,27 +767,18 @@ function printSurat() {
       .kop-text h3 { font-size: 16px; margin: 0; color: #000; }
       .kop-text h2 { font-size: 20px; margin: 2px 0; color: #000; }
       .kop-text p { font-size: 12px; margin: 0; color: #000; }
-      
       hr { border: 1.5px solid #000 !important; margin-bottom: 15px; }
-      
-      p { margin-bottom: 8px !important; } /* Jarak antar paragraf dirapatkan */
-      
+      p { margin-bottom: 8px !important; }
       .tabel-surat { width: 100%; font-size: 13px; margin-left: 20px; color: #000; }
-      .tabel-surat td { padding: 2px 0; } /* Jarak baris tabel dirapatkan */
-      
-      /* Area Tanda Tangan dirapatkan */
+      .tabel-surat td { padding: 2px 0; }
       .ttd-area { 
         display: flex !important; 
         justify-content: space-between; 
-        margin-top: 20px !important; /* Dikurangi dari 50px */
+        margin-top: 20px !important; 
         text-align: left; 
         color: #000; 
       }
-      
-      /* Memastikan tidak ada elemen yang terpotong */
-      * { 
-        page-break-inside: avoid; 
-      }
+      * { page-break-inside: avoid; }
     </style>
   `);
   
