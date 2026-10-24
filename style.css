@@ -843,3 +843,41 @@ button.btn-login:hover {
 .modal-content h3 + label {
   margin-top: 0;
 }
+/* ================= STYLE IKON MATA PASSWORD ================= */
+.password-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px; /* Menyesuaikan jarak dengan input sebelumnya */
+}
+
+.password-container input {
+  width: 100%;
+  padding: 12px 40px 12px 15px; /* Padding kanan dilebarkan agar teks tidak menabrak ikon */
+  border: 1px solid #cbd5e1; 
+  border-radius: 8px; 
+  font-size: 14px;
+  transition: 0.3s; 
+  background: #f8fafc;
+  margin-bottom: 0 !important; /* Menghapus margin bawaan input */
+}
+
+.password-container input:focus {
+  border-color: #15803d; 
+  outline: none; 
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
+}
+
+.password-container i {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.password-container i:hover {
+  color: #15803d;
+}
