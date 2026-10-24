@@ -776,29 +776,29 @@ function printSurat() {
   
   printWindow.document.write('<html><head><title>Cetak Surat</title>');
   
-  // KODE CSS YANG MENYEMBUNYIKAN SEMUA ELEMEN WEB
+  // KODE CSS YANG MEMAKSA HANYA 1 HALAMAN
   printWindow.document.write(`
     <style>
-      /* Sembunyikan semua elemen di luar surat */
+      @page { 
+        size: A4 portrait; 
+        margin: 15mm; 
+      }
+      body { 
+        font-family: 'Times New Roman', serif !important; 
+        font-size: 13px; 
+        line-height: 1.3; 
+        background: #fff !important; 
+        color: #000 !important; 
+        margin: 0;
+        padding: 0;
+      }
+      
+      /* KUNCI UTAMANYA: Sembunyikan semua elemen, lalu munculkan hanya #isi-surat */
       body * {
-        visibility: hidden;
+        display: none !important; /* Menghilangkan elemen lain sepenuhnya */
       }
-      
-      /* Tampilkan HANYA bagian isi surat */
       #isi-surat, #isi-surat * {
-        visibility: visible;
-      }
-      
-      /* Atur posisi surat agar pas di kertas A4 */
-      #isi-surat {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        font-family: 'Times New Roman', serif !important;
-        font-size: 14px;
-        color: #000 !important;
-        background: #fff !important;
+        display: block !important; /* Memunculkan hanya isi surat */
       }
 
       /* Atur Kop Surat */
@@ -818,8 +818,8 @@ function printSurat() {
       
       p { margin-bottom: 8px !important; }
       
-      .tabel-surat { width: 100%; font-size: 14px; margin-left: 20px; color: #000; }
-      .tabel-surat td { padding: 2px 0; }
+      .tabel-surat { width: 100%; font-size: 13px; margin-left: 20px; color: #000; display: table !important; }
+      .tabel-surat td { padding: 2px 0; display: table-cell !important; }
       
       .ttd-area { 
         display: flex !important; 
@@ -828,11 +828,11 @@ function printSurat() {
         text-align: left; 
         color: #000; 
       }
-      
-      /* Mencegah elemen terpotong ke halaman 2 */
-      * { 
-        page-break-inside: avoid; 
+      .ttd-area div {
+        display: block !important;
       }
+      
+      * { page-break-inside: avoid; }
     </style>
   `);
   
