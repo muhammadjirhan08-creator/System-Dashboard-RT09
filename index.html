@@ -277,15 +277,36 @@
 
         <div id="tampilan-form-surat" style="display: none;">
           <div class="form-surat-container">
-            <div class="form-surat-input" id="form-input-surat">
+                        <div class="form-surat-input" id="form-input-surat">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3 style="margin: 0;">Buat Surat Baru</h3>
                 <button class="btn-secondary" onclick="batalTambahSurat()" style="padding: 5px 10px;"><i class="fas fa-times"></i> Batal</button>
               </div>
+              
               <label>Nama Lengkap</label><input type="text" id="s-nama" placeholder="Masukkan nama...">
               <label>NIK</label><input type="text" id="s-nik" placeholder="Masukkan NIK...">
+              <label>Nomor KK</label><input type="text" id="s-kk" placeholder="Masukkan Nomor KK...">
+              <label>Tempat & Tanggal Lahir</label><input type="text" id="s-ttl" placeholder="Contoh: Balikpapan, 1 Januari 1990">
+              
+              <label>Jenis Kelamin</label>
+              <select id="s-jk">
+                <option value="Laki-laki">Laki-laki</option>
+                <option value="Perempuan">Perempuan</option>
+              </select>
+
+              <label>Status Perkawinan</label>
+              <select id="s-perkawinan">
+                <option value="Kawin">Kawin</option>
+                <option value="Belum Kawin">Belum Kawin</option>
+                <option value="Janda">Janda</option>
+                <option value="Duda">Duda</option>
+              </select>
+
+              <label>Agama</label><input type="text" id="s-agama" placeholder="Contoh: Islam">
+              <label>Pekerjaan</label><input type="text" id="s-pekerjaan" placeholder="Contoh: Karyawan Swasta">
               <label>Alamat</label><input type="text" id="s-alamat" placeholder="Masukkan alamat...">
               <label>Keperluan</label><input type="text" id="s-keperluan" placeholder="Contoh: Pembuatan SKCK">
+              
               <button class="btn-primary" onclick="simpanSuratBaru()" style="margin-top: 15px; width: 100%; justify-content: center; background: #10b981;"><i class="fas fa-save"></i> Simpan & Kembali ke List</button>
             </div>
 
@@ -304,8 +325,10 @@
                 <table class="tabel-surat">
                   <tr><td>Nama</td><td>:</td><td id="hasil-nama">-</td></tr>
                   <tr><td>NIK</td><td>:</td><td id="hasil-nik">-</td></tr>
+                  <tr><td>Nomor KK</td><td>:</td><td id="hasil-kk">-</td></tr>
                   <tr><td>Tempat, Tanggal Lahir</td><td>:</td><td id="hasil-ttl">-</td></tr>
                   <tr><td>Jenis Kelamin</td><td>:</td><td id="hasil-jk">-</td></tr> <!-- TAMBAHKAN BARIS INI -->
+                  <tr><td>Status Perkawinan</td><td>:</td><td id="hasil-perkawinan">-</td></tr>
                   <tr><td>Agama</td><td>:</td><td id="hasil-agama">-</td></tr>
                   <tr><td>Pekerjaan</td><td>:</td><td id="hasil-pekerjaan">-</td></tr>
                   <tr><td>Alamat</td><td>:</td><td id="hasil-alamat">-</td></tr>

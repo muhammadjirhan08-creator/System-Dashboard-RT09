@@ -635,14 +635,29 @@ function batalTambahSurat() {
 async function simpanSuratBaru() {
   const nama = document.getElementById('s-nama').value.trim();
   const nik = document.getElementById('s-nik').value.trim();
+  const kk = document.getElementById('s-kk').value.trim();
+  const ttl = document.getElementById('s-ttl').value.trim();
+  const jk = document.getElementById('s-jk').value;
+  const perkawinan = document.getElementById('s-perkawinan').value;
+  const agama = document.getElementById('s-agama').value.trim();
+  const pekerjaan = document.getElementById('s-pekerjaan').value.trim();
   const alamat = document.getElementById('s-alamat').value.trim();
   const keperluan = document.getElementById('s-keperluan').value.trim();
+
   if(!nama || !nik || !keperluan) return alert('Mohon lengkapi Nama, NIK, dan Keperluan!');
+  
   const tgl = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+  
   try {
-    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "surat"), { nama, nik, alamat, keperluan, tanggal: tgl, status: 'Menunggu' });
-    alert('Surat berhasil dikirim ke sistem RT!'); batalTambahSurat();
-  } catch (error) { console.error("Error: ", error); alert('Gagal menyimpan data.'); }
+    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "surat"), { 
+      nama, nik, kk, ttl, jk, perkawinan, agama, pekerjaan, alamat, keperluan, tanggal: tgl, status: 'Menunggu' 
+    });
+    alert('Surat berhasil dikirim ke sistem RT!'); 
+    batalTambahSurat();
+  } catch (error) { 
+    console.error("Error: ", error); 
+    alert('Gagal menyimpan data.'); 
+  }
 }
 
 function renderSurat() {
@@ -716,11 +731,18 @@ async function downloadSuratPDF(idDokumen) {
     const docSnap = await getDoc(window.fbDoc(window.firebaseDB, "surat", idDokumen));
     if (docSnap.exists()) {
       const s = docSnap.data();
-      document.getElementById('hasil-nama').innerText = s.nama; document.getElementById('hasil-nik').innerText = s.nik; document.getElementById('hasil-alamat').innerText = s.alamat; document.getElementById('hasil-keperluan').innerText = s.keperluan; document.getElementById('tgl-surat').innerText = s.tanggal;
-      document.getElementById('hasil-ttl').innerText = s.tempatLahir + ', ' + s.tanggalLahir;
-      document.getElementById('hasil-jk').innerText = s.jenisKelamin;
-      document.getElementById('hasil-agama').innerText = s.agama;
-      document.getElementById('hasil-pekerjaan').innerText = s.pekerjaan;
+      document.getElementById('hasil-nama').innerText = s.nama || '-';
+      document.getElementById('hasil-nik').innerText = s.nik || '-';
+      document.getElementById('hasil-kk').innerText = s.kk || '-';
+      document.getElementById('hasil-ttl').innerText = s.ttl || '-';
+      document.getElementById('hasil-jk').innerText = s.jk || '-';
+      document.getElementById('hasil-perkawinan').innerText = s.perkawinan || '-';
+      document.getElementById('hasil-agama').innerText = s.agama || '-';
+      document.getElementById('hasil-pekerjaan').innerText = s.pekerjaan || '-';
+      document.getElementById('hasil-alamat').innerText = s.alamat || '-';
+      document.getElementById('hasil-keperluan').innerText = s.keperluan || '-';
+      document.getElementById('tgl-surat').innerText = s.tanggal;
+
       const element = document.getElementById('isi-surat');
       html2pdf().set({ margin: 1, filename: `Surat_Pengantar_${s.nama.replace(/\s+/g, '_')}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(element).save();
     } else { alert("Data surat tidak ditemukan."); }
@@ -766,7 +788,45 @@ async function updateStatusSurat(idDokumen, statusBaru) {
     alert(`Surat berhasil di${statusBaru === 'Disetujui' ? 'setujui' : 'tolak'}!`);
   } catch (error) { console.error("Error update status: ", error); alert("Gagal memproses surat."); }
 }
+async function printSuratDariFirebase(idDokumen) {
+  try {
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    const docSnap = await getDoc(window.fbDoc(window.firebaseDB, "surat", idDokumen));
+    
+    if (docSnap.exists()) {
+      const s = docSnap.data();
+      
+      // Isi data ke dalam template preview surat
+      document.getElementById('hasil-nama').innerText = s.nama || '-';
+      document.getElementById('hasil-nik').innerText = s.nik || '-';
+      document.getElementById('hasil-kk').innerText = s.kk || '-';
+      document.getElementById('hasil-ttl').innerText = s.ttl || '-';
+      document.getElementById('hasil-jk').innerText = s.jk || '-';
+      document.getElementById('hasil-perkawinan').innerText = s.perkawinan || '-';
+      document.getElementById('hasil-agama').innerText = s.agama || '-';
+      document.getElementById('hasil-pekerjaan').innerText = s.pekerjaan || '-';
+      document.getElementById('hasil-alamat').innerText = s.alamat || '-';
+      document.getElementById('hasil-keperluan').innerText = s.keperluan || '-';
+      document.getElementById('tgl-surat').innerText = s.tanggal;
 
+      // Sembunyikan form input, tampilkan preview
+      document.getElementById('form-input-surat').style.display = 'none'; 
+      document.getElementById('preview-surat').style.display = 'block';
+      
+      // Panggil fungsi printSurat() yang sudah ada di atasnya
+      printSurat();
+      
+      // Kembalikan tampilan setelah print
+      setTimeout(() => { 
+        document.getElementById('form-input-surat').style.display = 'block'; 
+        document.getElementById('preview-surat').style.display = 'none'; 
+      }, 1000);
+    }
+  } catch (error) { 
+    console.error("Error print: ", error); 
+    alert("Gagal mencetak surat."); 
+  }
+}
 // =======================================================
 // 13. LAPORAN, PENCARIAN, POSTER
 // =======================================================
