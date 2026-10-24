@@ -885,3 +885,15 @@ button.btn-login:hover {
   background: #dbeafe; 
   color: #1e40af; 
 }
+/* Memperbaiki lebar input dan dropdown di form surat */
+.form-surat-input select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background-color: #fff;
+  color: #1e293b;
+}
