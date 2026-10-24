@@ -298,7 +298,8 @@
                 <h3 style="margin: 0;">Buat Surat Baru</h3>
                 <button class="btn-secondary" onclick="batalTambahSurat()" style="padding: 5px 10px;"><i class="fas fa-times"></i> Batal</button>
               </div>
-              
+              <label>Nomor Surat</label>
+              <input type="text" id="s-nomor-surat" placeholder="Contoh: 01/RT09/KRJ/2026">
               <label>Nama Lengkap</label><input type="text" id="s-nama" placeholder="Masukkan nama...">
               <label>NIK</label><input type="text" id="s-nik" placeholder="Masukkan NIK...">
               <label>Nomor KK</label><input type="text" id="s-kk" placeholder="Masukkan Nomor KK...">
@@ -331,12 +332,27 @@
                 <div class="kop-surat">
                   <img src="balikpapanMascot.png" alt="Logo" style="width: 70px;">
                   <div class="kop-text">
-                    <h3>KETUA RUKUN TETANGGA 09</h3><h2>Jalan Karang Rejo II No.35 Telp. 0851-0166-4964</h2>
+                    <h3>KETUA RUKUN TETANGGA 09</h3><p>Jalan Karang Rejo II No.35 Telp. 0851-0166-4964</p>
                     <p>Kelurahan Karang Rejo, Kecamatan Balikpapan Tengah</p><p>B A L I K P A P A N</p>
                   </div>
                 </div>
                 <hr style="border: 2px solid #000; margin-bottom: 20px;">
-                <h3 style="text-align: center; text-decoration: underline; margin-bottom: 30px;">SURAT PENGANTAR</h3>
+                <!-- Tujuan Surat -->
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                  <div style="text-align: left; font-size: 14px;">
+                    <p style="margin: 0;">Kepada Yth</p>
+                    <p style="margin: 0;">Bapak Lurah Karang Rejo</p>
+                    <p style="margin: 0;">Kecamatan Balikpapan Tengah</p>
+                    <p style="margin: 0;">di -</p>
+                    <p style="margin: 0; padding-left: 20px;">Tempat</p>
+                  </div>
+                </div>
+
+                <!-- Judul & Nomor Surat -->
+                <div style="text-align: center; margin-bottom: 30px; margin-top: 20px;">
+                  <h3 style="text-decoration: underline; margin: 0; font-size: 16px;">SURAT PENGANTAR</h3>
+                  <p style="margin: 5px 0 0 0; font-size: 14px;">No. <span id="hasil-nomor-surat">....</span></p>
+                </div>
                 <p style="margin-bottom: 20px;">Yang bertanda tangan di bawah ini Ketua RT 09 Kelurahan Karang Rejo, Kecamatan Balikpapan Tengah, menerangkan dengan sebenarnya bahwa:</p>
                 <table class="tabel-surat">
                   <tr><td>Nama</td><td>:</td><td id="hasil-nama">-</td></tr>

@@ -643,15 +643,32 @@ async function simpanSuratBaru() {
   const pekerjaan = document.getElementById('s-pekerjaan').value.trim();
   const alamat = document.getElementById('s-alamat').value.trim();
   const keperluan = document.getElementById('s-keperluan').value.trim();
+  
+  // TAMBAHKAN BARIS INI UNTUK MENGAMBIL NOMOR SURAT
+  const nomorSurat = document.getElementById('s-nomor-surat').value.trim(); 
 
   if(!nama || !nik || !keperluan) return alert('Mohon lengkapi Nama, NIK, dan Keperluan!');
   
   const tgl = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
   
   try {
+    // TAMBAHKAN nomorSurat DI DALAM KURUNG KURAWAL INI
     await window.fbAddDoc(window.fbCollection(window.firebaseDB, "surat"), { 
-      nama, nik, kk, ttl, jk, perkawinan, agama, pekerjaan, alamat, keperluan, tanggal: tgl, status: 'Menunggu' 
+      nomorSurat: nomorSurat, 
+      nama: nama, 
+      nik: nik, 
+      kk: kk, 
+      ttl: ttl, 
+      jk: jk, 
+      perkawinan: perkawinan, 
+      agama: agama, 
+      pekerjaan: pekerjaan, 
+      alamat: alamat, 
+      keperluan: keperluan, 
+      tanggal: tgl, 
+      status: 'Menunggu' 
     });
+    
     showToast('Surat berhasil dikirim ke sistem RT!');
     batalTambahSurat();
   } catch (error) { 
