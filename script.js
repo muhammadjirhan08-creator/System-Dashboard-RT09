@@ -90,6 +90,7 @@ document.querySelectorAll('.sidebar .menu li[data-page]').forEach(item => {
     if (page === 'surat') renderSurat();
     if (page === 'home') renderHomeSurat();
     if (page === 'pengaduan') renderPengaduan();
+    if (page === 'pengaduan') renderHomePengaduan();
   });
 });
 
@@ -163,7 +164,7 @@ function showDashboard() {
     adminOnlyItems.forEach(item => item.style.display = 'flex');
   }
 
-  renderWarga(); renderKK(); renderIuran(); renderPengumuman(); renderPengaduan(); renderCharts(); renderHomeSurat();
+  renderWarga(); renderKK(); renderIuran(); renderPengumuman(); renderPengaduan(); renderCharts(); renderHomeSurat(); renderHomePengaduan();
   
   const homeMenu = document.querySelector('[data-page="home"]');
   if(homeMenu) homeMenu.click();
@@ -1199,6 +1200,65 @@ function renderPengaduan() {
           <td><span class="badge ${badgeClass}">${d.status || 'Menunggu'}</span></td>
           <td>${tombolAksi}</td>
         </tr>`;
+    });
+  });
+}
+
+function renderHomePengaduan() {
+  const homeList = document.getElementById('home-list-pengaduan');
+  if (!homeList) return;
+
+  const namaUserAktif = sessionStorage.getItem('namaUser') || '';
+  const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
+  const isAdmin = adminPenuh.includes(namaUserAktif);
+
+  window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengaduan"), (snapshot) => {
+    homeList.innerHTML = '';
+    
+    if (snapshot.empty) {
+      homeList.innerHTML = '<p style="color:#64748b; font-size:13px;">Belum ada laporan terbaru.</p>';
+      return;
+    }
+
+    // Ambil maksimal 3 aduan terbaru
+    const listArray = [];
+    snapshot.forEach((doc) => {
+      listArray.push({ id: doc.id, data: doc.data() });
+    });
+    const recentList = listArray.slice(-3).reverse();
+
+    recentList.forEach((item) => {
+      const d = item.data;
+      const id = item.id;
+
+      // Jika Warga, hanya tampilkan aduan miliknya sendiri
+      if (!isAdmin && d.pelapor !== namaUserAktif) return;
+
+      let badgeClass = 'badge-warning'; // Kuning
+      if (d.status === 'Diproses') badgeClass = 'badge-primary'; // Biru
+      if (d.status === 'Selesai') badgeClass = 'badge-success'; // Hijau
+
+      // Tombol Tanggapi hanya untuk Admin
+      let tombolAdmin = '';
+      if (isAdmin) {
+        tombolAdmin = `<button class="btn-secondary" onclick="bukaTanggapi('${id}')" style="margin-left: 10px; background: #3b82f6; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px;"><i class="fas fa-reply"></i> Tanggapi</button>`;
+      }
+
+      homeList.innerHTML += `
+        <div class="list-item" style="align-items: flex-start;">
+          <div class="list-icon red" style="background: #fee2e2; color: #ef4444;"><i class="fas fa-exclamation-circle"></i></div>
+          <div class="list-content" style="width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h4 style="margin-bottom: 2px;">${d.judul}</h4>
+              ${tombolAdmin}
+            </div>
+            <p style="margin-bottom: 6px; font-size: 13px;">${d.deskripsi}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <small>Pelapor: <strong>${d.pelapor}</strong></small>
+              <span class="badge ${badgeClass}">${d.status}</span>
+            </div>
+          </div>
+        </div>`;
     });
   });
 }
