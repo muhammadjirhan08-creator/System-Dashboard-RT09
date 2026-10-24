@@ -716,13 +716,73 @@ async function hapusSuratDariList(idDokumen) {
 function printSurat() {
   const printContent = document.getElementById('isi-surat').innerHTML;
   const printWindow = window.open('', '', 'height=800,width=800');
+  
   printWindow.document.write('<html><head><title>Cetak Surat</title>');
-  printWindow.document.write(`<style>body{font-family:'Times New Roman',serif!important;padding:40px;background:#fff!important;color:#000!important}#isi-surat{display:block!important;visibility:visible!important}.kop-surat{display:flex!important;align-items:center;gap:20px;justify-content:center;text-align:center}.kop-text h3{font-size:18px;margin:0;color:#000}.kop-text h2{font-size:22px;margin:5px 0;color:#000}.kop-text p{font-size:14px;margin:0;color:#000}.tabel-surat{width:100%;font-size:16px;margin-left:20px;color:#000}.tabel-surat td{padding:5px 0}.ttd-area{display:flex!important;justify-content:flex-end;margin-top:50px;text-align:center;color:#000}hr{border:2px solid #000!important;margin-bottom:20px}p{color:#000!important}</style>`);
+  printWindow.document.write(`
+    <style>
+      /* Mengatur ukuran kertas dan margin */
+      @page { 
+        size: A4 portrait; 
+        margin: 10mm; /* Margin kertas sangat tipis (1cm) */
+      }
+      body { 
+        font-family: 'Times New Roman', serif !important; 
+        font-size: 13px; /* Ukuran font diperkecil agar muat */
+        line-height: 1.3; /* Jarak antar baris dirapatkan */
+        background: #fff !important; 
+        color: #000 !important; 
+        margin: 0;
+        padding: 0;
+      }
+      #isi-surat { 
+        display: block !important; 
+        visibility: visible !important; 
+      }
+      .kop-surat { 
+        display: flex !important; 
+        align-items: center; 
+        gap: 15px; 
+        justify-content: center; 
+        text-align: center; 
+        margin-bottom: 10px;
+      }
+      .kop-text h3 { font-size: 16px; margin: 0; color: #000; }
+      .kop-text h2 { font-size: 20px; margin: 2px 0; color: #000; }
+      .kop-text p { font-size: 12px; margin: 0; color: #000; }
+      
+      hr { border: 1.5px solid #000 !important; margin-bottom: 15px; }
+      
+      p { margin-bottom: 8px !important; } /* Jarak antar paragraf dirapatkan */
+      
+      .tabel-surat { width: 100%; font-size: 13px; margin-left: 20px; color: #000; }
+      .tabel-surat td { padding: 2px 0; } /* Jarak baris tabel dirapatkan */
+      
+      /* Area Tanda Tangan dirapatkan */
+      .ttd-area { 
+        display: flex !important; 
+        justify-content: space-between; 
+        margin-top: 20px !important; /* Dikurangi dari 50px */
+        text-align: left; 
+        color: #000; 
+      }
+      
+      /* Memastikan tidak ada elemen yang terpotong */
+      * { 
+        page-break-inside: avoid; 
+      }
+    </style>
+  `);
+  
   printWindow.document.write('</head><body>');
   printWindow.document.write('<div id="isi-surat">' + printContent + '</div>');
   printWindow.document.write('</body></html>');
-  printWindow.document.close(); printWindow.focus();
-  setTimeout(() => { printWindow.print(); }, 1000);
+  
+  printWindow.document.close(); 
+  printWindow.focus();
+  
+  setTimeout(() => { 
+    printWindow.print(); 
+  }, 1000);
 }
 
 async function downloadSuratPDF(idDokumen) {
@@ -744,7 +804,15 @@ async function downloadSuratPDF(idDokumen) {
       document.getElementById('tgl-surat').innerText = s.tanggal;
 
       const element = document.getElementById('isi-surat');
-      html2pdf().set({ margin: 1, filename: `Surat_Pengantar_${s.nama.replace(/\s+/g, '_')}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(element).save();
+      // 2. Pengaturan PDF (margin tipis & format A4)
+      const opt = {
+        margin:       [0.2, 0.5, 0.2, 0.5], // [Atas, Kiri, Bawah, Kanan] tipis
+        filename:     `Surat_Pengantar_${s.nama.replace(/\s+/g, '_')}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, scrollY: 0 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
     } else { alert("Data surat tidak ditemukan."); }
   } catch (error) { console.error("Error download: ", error); alert("Gagal mengunduh PDF."); }
 }
@@ -954,7 +1022,7 @@ function renderPengaduan() {
   const namaUserAktif = sessionStorage.getItem('namaUser') || '';
   const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
   const isAdmin = adminPenuh.includes(namaUserAktif);
-  
+
   const btnContainer = document.getElementById('form-pengaduan-container');
   if (btnContainer) {
     btnContainer.style.display = isAdmin ? 'block' : 'none';
