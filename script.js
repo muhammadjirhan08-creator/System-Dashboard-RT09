@@ -476,6 +476,11 @@ function hapusIuran(index) {
 // 10. PENGUMUMAN
 // =======================================================
 function renderPengumuman() {
+  // Ambil data user yang login di paling atas fungsi
+  const namaUserAktif = sessionStorage.getItem('namaUser') || '';
+  const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
+  const isAdmin = adminPenuh.includes(namaUserAktif);
+
   // ==========================================
   // BAGIAN 1: UNTUK HALAMAN MENU PENGUMUMAN
   // ==========================================
@@ -490,11 +495,20 @@ function renderPengumuman() {
       snapshot.forEach((doc) => {
         const p = doc.data();
         
-        // Pesan WhatsApp
         const pesanWA = encodeURIComponent(`*PENGUMUMAN RT 09 KARANG REJO*\n\n*Judul:* ${p.judul}\n*Tanggal:* ${p.tanggal}\n\n${p.isi}\n\n_— Sistem Informasi RT 09_`);
         const linkWA = `https://wa.me/?text=${pesanWA}`;
 
-         // TOMBOL WA HANYA MUNCUL JIKA ADMIN
+        // Tombol WA hanya dibuat jika Admin
+        let tombolWA = '';
+        if (isAdmin) {
+          tombolWA = `<a href="${linkWA}" target="_blank" class="btn-secondary" style="background: #25D366; color: white; border: none; padding: 5px 10px; border-radius: 5px; text-decoration: none;" title="Bagikan ke WhatsApp"><i class="fab fa-whatsapp"></i></a>`;
+        }
+
+        // Tombol Hapus hanya dibuat jika Admin
+        let tombolHapus = '';
+        if (isAdmin) {
+          tombolHapus = `<button class="btn-secondary" onclick="hapusPengumuman('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>`;
+        }
 
         list.innerHTML += `
           <div class="pengumuman-item" style="position: relative;">
@@ -503,9 +517,8 @@ function renderPengumuman() {
             <small>📅 ${p.tanggal}</small>
             
             <div style="position: absolute; top: 15px; right: 15px; display: flex; gap: 5px;">
-              ${tombolWA} <!-- Hanya muncul jika Admin -->
-              
-              ${isAdmin ? `<button class="btn-secondary" onclick="hapusPengumuman('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>` : ''}
+              ${tombolWA}
+              ${tombolHapus}
             </div>
           </div>`;
       });
@@ -528,7 +541,14 @@ function renderPengumuman() {
       snapshot.forEach((doc) => {
         if (count < 3) {
           const p = doc.data();
-               homeList.innerHTML += `
+          
+          // Tombol WA di Home hanya untuk Admin
+          let tombolWAHome = '';
+          if (isAdmin) {
+            tombolWAHome = `<a href="https://wa.me/?text=${encodeURIComponent(`*PENGUMUMAN RT 09*\n\n*${p.judul}*\n${p.isi}\n\n_— RT 09 Karang Rejo_`)}" target="_blank" style="position: absolute; top: 15px; right: 15px; color: #25D366; font-size: 20px;" title="Bagikan ke WhatsApp"><i class="fab fa-whatsapp"></i></a>`;
+          }
+
+          homeList.innerHTML += `
             <div class="list-item" style="position: relative;">
               <div class="list-icon green"><i class="fas fa-bullhorn"></i></div>
               <div class="list-content">
@@ -536,7 +556,7 @@ function renderPengumuman() {
                 <p>${p.isi}</p>
                 <small>📅 ${p.tanggal}</small>
               </div>
-              ${tombolWAHome} <!-- Hanya muncul jika Admin -->
+              ${tombolWAHome}
             </div>`;
           count++;
         }
