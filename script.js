@@ -793,7 +793,7 @@ function printSurat() {
     <style>
       @page { 
         size: A4 portrait; 
-        margin: 15mm; 
+        margin: 10mm; 
       }
       body { 
         font-family: 'Times New Roman', serif !important; 
@@ -885,8 +885,8 @@ async function downloadSuratPDF(idDokumen) {
 
       const element = document.getElementById('isi-surat');
       // 2. Pengaturan PDF (margin tipis & format A4)
-      const opt = {
-        margin:       [0.2, 0.5, 0.2, 0.5], // [Atas, Kiri, Bawah, Kanan] tipis
+        const opt = {
+        margin:       [0.1, 0.4, 0.1, 0.4], // [Atas, Kiri, Bawah, Kanan] dibuat sangat tipis
         filename:     `Surat_Pengantar_${s.nama.replace(/\s+/g, '_')}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, scrollY: 0 },
