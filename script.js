@@ -652,33 +652,40 @@ async function simpanPengumuman() {
   let imageUrl = '';
 
   try {
-    // Proses Upload Gambar ke Cloudinary (Jika ada file)
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('upload_preset', 'system_dashboard_rt09'); // Sesuai nama preset Anda
+      // Pastikan nama preset SAMA PERSIS (tanpa spasi tambahan)
+      formData.append('upload_preset', 'system_dashboard_rt09'); 
 
+      // Pastikan Cloud Name Anda benar (chmaylor)
       const response = await fetch('https://api.cloudinary.com/v1_1/chmaylor/image/upload', {
         method: 'POST',
         body: formData
       });
       
       const data = await response.json();
-      imageUrl = data.secure_url; // Mengambil link gambar dari Cloudinary
+      
+      // CEK JIKA UPLOAD GAGAL
+      if (!data.secure_url) {
+        console.error("Cloudinary Error:", data);
+        return alert("Gagal upload gambar: " + (data.error?.message || "Periksa konfigurasi Cloudinary"));
+      }
+      
+      imageUrl = data.secure_url;
     }
 
-    // Simpan ke Firebase Firestore (PERHATIKAN NAMA COLLECTION)
-    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "pengumuman"), { // HARUS "pengumuman"
+    // Simpan ke Firebase (Gunakan imageUrl || '' agar tidak undefined)
+    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "pengumuman"), {
       judul: judul,
       isi: isi,
       tanggal: tanggal,
-      gambar: imageUrl 
+      gambar: imageUrl || '' 
     });
     
     showToast('Pengumuman berhasil ditambahkan!');
     closeModal('modal-pengumuman');
     
-    // Reset Form
     document.getElementById('p-judul').value = '';
     document.getElementById('p-isi').value = '';
     fileInput.value = '';
