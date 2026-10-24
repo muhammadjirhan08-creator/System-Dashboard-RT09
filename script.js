@@ -776,7 +776,6 @@ function printSurat() {
   
   printWindow.document.write('<html><head><title>Cetak Surat</title>');
   
-  // KODE CSS YANG MEMAKSA HANYA 1 HALAMAN
   printWindow.document.write(`
     <style>
       @page { 
@@ -786,22 +785,29 @@ function printSurat() {
       body { 
         font-family: 'Times New Roman', serif !important; 
         font-size: 13px; 
-        line-height: 1.3; 
+        line-height: 1.2; 
         background: #fff !important; 
         color: #000 !important; 
         margin: 0;
         padding: 0;
       }
       
-      /* KUNCI UTAMANYA: Sembunyikan semua elemen, lalu munculkan hanya #isi-surat */
+      /* Hanya tampilkan isi surat */
       body * {
-        display: none !important; /* Menghilangkan elemen lain sepenuhnya */
+        visibility: hidden;
       }
       #isi-surat, #isi-surat * {
-        display: block !important; /* Memunculkan hanya isi surat */
+        visibility: visible;
+      }
+      
+      #isi-surat {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
       }
 
-      /* Atur Kop Surat */
+      /* Format Kop Surat */
       .kop-surat { 
         display: flex !important; 
         align-items: center; 
@@ -810,26 +816,24 @@ function printSurat() {
         text-align: center; 
         margin-bottom: 10px;
       }
-      .kop-text h3 { font-size: 16px; margin: 0; color: #000; }
-      .kop-text h2 { font-size: 20px; margin: 2px 0; color: #000; }
-      .kop-text p { font-size: 12px; margin: 0; color: #000; }
+      .kop-text h3 { font-size: 16px; margin: 0; }
+      .kop-text h2 { font-size: 18px; margin: 2px 0; }
+      .kop-text p { font-size: 11px; margin: 0; }
       
-      hr { border: 1.5px solid #000 !important; margin-bottom: 15px; }
+      hr { border: 1.5px solid #000 !important; margin-bottom: 10px; }
       
-      p { margin-bottom: 8px !important; }
+      p { margin-bottom: 6px !important; }
       
-      .tabel-surat { width: 100%; font-size: 13px; margin-left: 20px; color: #000; display: table !important; }
-      .tabel-surat td { padding: 2px 0; display: table-cell !important; }
+      /* Tabel format */
+      .tabel-surat { width: 100%; font-size: 13px; margin-left: 20px; display: table !important; }
+      .tabel-surat tr { display: table-row !important; }
+      .tabel-surat td { padding: 1px 0; display: table-cell !important; }
       
       .ttd-area { 
         display: flex !important; 
         justify-content: space-between; 
-        margin-top: 20px !important; 
+        margin-top: 15px !important; 
         text-align: left; 
-        color: #000; 
-      }
-      .ttd-area div {
-        display: block !important;
       }
       
       * { page-break-inside: avoid; }
