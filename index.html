@@ -110,27 +110,55 @@
         <h2 style="margin-bottom: 20px;">Home</h2>
         <div class="home-section">
           <h3 class="section-title"><i class="fas fa-bolt" style="color: #f59e0b;"></i> Quick Action</h3>
-          <div class="quick-action-grid">
-            <div class="qa-item" onclick="document.querySelector('[data-page=warga]').click()">
-              <div class="qa-icon blue"><i class="fas fa-users"></i></div><span>Data Warga</span>
+            <div class="quick-action-grid">
+            <!-- 1. Dashboard (Semua User) -->
+            <div class="qa-item" onclick="document.querySelector('[data-page=dashboard]').click()">
+              <div class="qa-icon blue" style="background: #3b82f6;"><i class="fas fa-chart-line"></i></div>
+              <span>Dashboard</span>
             </div>
-            <div class="qa-item" onclick="document.querySelector('[data-page=kk]').click()">
-              <div class="qa-icon blue" style="background: #0ea5e9;"><i class="fas fa-id-card"></i></div><span>Data KK</span>
+
+            <!-- 2. Data Warga (Hanya Admin) -->
+            <div class="qa-item admin-only" onclick="document.querySelector('[data-page=warga]').click()">
+              <div class="qa-icon blue"><i class="fas fa-users"></i></div>
+              <span>Data Warga</span>
             </div>
-            <div class="qa-item" onclick="document.querySelector('[data-page=iuran]').click()">
-              <div class="qa-icon green"><i class="fas fa-money-bill-wave"></i></div><span>Iuran</span>
+            
+            <!-- 3. Data KK (Hanya Admin) -->
+            <div class="qa-item admin-only" onclick="document.querySelector('[data-page=kk]').click()">
+              <div class="qa-icon blue" style="background: #0ea5e9;"><i class="fas fa-id-card"></i></div>
+              <span>Data KK</span>
             </div>
+
+            <!-- 4. Iuran (Hanya Admin) -->
+            <div class="qa-item admin-only" onclick="document.querySelector('[data-page=iuran]').click()">
+              <div class="qa-icon green"><i class="fas fa-money-bill-wave"></i></div>
+              <span>Iuran</span>
+            </div>
+
+            <!-- 5. Laporan (Semua User) -->
             <div class="qa-item" onclick="document.querySelector('[data-page=laporan]').click()">
-              <div class="qa-icon orange"><i class="fas fa-file-invoice"></i></div><span>Laporan</span>
+              <div class="qa-icon orange"><i class="fas fa-file-invoice"></i></div>
+              <span>Laporan Keuangan</span>
             </div>
-            <div class="qa-item" onclick="document.querySelector('[data-page=pengumuman]').click()">
-              <div class="qa-icon red" style="background: #ec4899;"><i class="fas fa-bullhorn"></i></div><span>Pengumuman</span>
+
+            <!-- 6. Pengumuman (Hanya Admin) -->
+            <div class="qa-item admin-only" onclick="document.querySelector('[data-page=pengumuman]').click()">
+              <div class="qa-icon red" style="background: #ec4899;"><i class="fas fa-bullhorn"></i></div>
+              <span>Pengumuman</span>
             </div>
+
+            <!-- 7. Surat Pengantar (Semua User) -->
             <div class="qa-item" onclick="document.querySelector('[data-page=surat]').click()">
-              <div class="qa-icon purple" style="background: #8b5cf6;"><i class="fas fa-envelope"></i></div><span>Surat Pengantar</span>
+              <div class="qa-icon purple" style="background: #8b5cf6;"><i class="fas fa-envelope"></i></div>
+              <span>Surat Pengantar</span>
+            </div>
+
+            <!-- 8. Pengaduan Warga (Hanya Admin) -->
+            <div class="qa-item admin-only" onclick="document.querySelector('[data-page=pengaduan]').click()">
+              <div class="qa-icon red" style="background: #dc2626;"><i class="fas fa-exclamation-circle"></i></div>
+              <span>Pengaduan Warga</span>
             </div>
           </div>
-        </div>
         
         <div class="home-bottom-grid">
           <div class="home-section">

@@ -146,14 +146,21 @@ function showDashboard() {
   const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
   const sidebarMenus = document.querySelectorAll('.sidebar .menu li');
 
-  if (!adminPenuh.includes(namaUser)) {
-        const menuTerlarang = ['warga', 'kk', 'iuran', 'pengumuman', 'pengaduan'];
+    if (!adminPenuh.includes(namaUser)) {
+    const menuTerlarang = ['warga', 'kk', 'iuran', 'pengumuman', 'pengaduan'];
     sidebarMenus.forEach(menu => {
       const pageName = menu.getAttribute('data-page');
       if (menuTerlarang.includes(pageName)) menu.style.display = 'none'; 
     });
   } else {
     sidebarMenus.forEach(menu => menu.style.display = 'flex');
+  }
+    // Sembunyikan Quick Action khusus Admin jika yang login Warga
+  const adminOnlyItems = document.querySelectorAll('.admin-only');
+  if (!adminPenuh.includes(namaUser)) {
+    adminOnlyItems.forEach(item => item.style.display = 'none');
+  } else {
+    adminOnlyItems.forEach(item => item.style.display = 'flex');
   }
 
   renderWarga(); renderKK(); renderIuran(); renderPengumuman(); renderPengaduan(); renderCharts(); renderHomeSurat();
