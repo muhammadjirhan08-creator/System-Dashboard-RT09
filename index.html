@@ -606,6 +606,22 @@
     </div>
   </div>
 
+    <!-- Modal Edit Pengumuman -->
+  <div id="modal-edit-pengumuman" class="modal">
+    <div class="modal-content">
+      <h3>Edit Pengumuman</h3>
+      <input type="hidden" id="edit-p-id">
+      <label>Judul</label>
+      <input type="text" id="edit-p-judul" placeholder="Judul">
+      <label>Isi Pengumuman</label>
+      <textarea id="edit-p-isi" placeholder="Isi pengumuman" rows="4"></textarea>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal('modal-edit-pengumuman')">Batal</button>
+        <button class="btn-primary" onclick="simpanEditPengumuman()">Update</button>
+      </div>
+    </div>
+  </div>
+  
   <!-- Modal Buat Pengaduan (Warga) -->
   <div id="modal-pengaduan" class="modal">
     <div class="modal-content">

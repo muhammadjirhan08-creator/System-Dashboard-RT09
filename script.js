@@ -561,29 +561,25 @@ function renderPengumuman() {
         const pesanWA = encodeURIComponent(`*PENGUMUMAN RT 09 KARANG REJO*\n\n*Judul:* ${p.judul}\n*Tanggal:* ${p.tanggal}\n\n${p.isi}${linkGambarWA}\n\n_— Sistem Informasi RT 09_`);
         const linkWA = `https://wa.me/?text=${pesanWA}`;
 
-        // Tombol WA hanya dibuat jika Admin
-        let tombolWA = '';
+        // TOMBOL EDIT & HAPUS (Hanya Admin)
+        let tombolAksiAdmin = '';
         if (isAdmin) {
-          tombolWA = `<a href="${linkWA}" target="_blank" class="btn-secondary" style="background: #25D366; color: white; border: none; padding: 5px 10px; border-radius: 5px; text-decoration: none;" title="Bagikan ke WhatsApp"><i class="fab fa-whatsapp"></i></a>`;
+          tombolAksiAdmin = `
+            <button class="btn-secondary" onclick="bukaEditPengumuman('${doc.id}')" style="background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Edit"><i class="fas fa-edit"></i></button>
+            <button class="btn-secondary" onclick="hapusPengumuman('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
+          `;
         }
 
-        // Tombol Hapus hanya dibuat jika Admin
-        let tombolHapus = '';
-        if (isAdmin) {
-          tombolHapus = `<button class="btn-secondary" onclick="hapusPengumuman('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>`;
-        }
-
-        // 3. Tampilkan gambarHTML di dalam list.innerHTML
         list.innerHTML += `
           <div class="pengumuman-item" style="position: relative;">
             <h4>${p.judul}</h4>
             <p>${p.isi}</p>
-            ${gambarHTML} <!-- GAMBAR MUNCUL DI SINI -->
+            ${gambarHTML} 
             <small>📅 ${p.tanggal}</small>
             
             <div style="position: absolute; top: 15px; right: 15px; display: flex; gap: 5px;">
               ${tombolWA}
-              ${tombolHapus}
+              ${tombolAksiAdmin}
             </div>
           </div>`;
       });
@@ -1287,5 +1283,52 @@ async function updateStatusSurat(idDokumen, statusBaru) {
   } catch (error) {
     console.error("Error update status: ", error);
     alert("Gagal memproses surat.");
+  }
+}
+async function hapusPengumuman(idDokumen) {
+  if (confirm('Apakah Anda yakin ingin menghapus pengumuman ini?')) {
+    try {
+      await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "pengumuman", idDokumen));
+      showToast('Pengumuman berhasil dihapus!');
+    } catch (error) {
+      console.error("Error hapus: ", error);
+      alert("Gagal menghapus pengumuman.");
+    }
+  }
+}
+async function bukaEditPengumuman(idDokumen) {
+  try {
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    const docSnap = await getDoc(window.fbDoc(window.firebaseDB, "pengumuman", idDokumen));
+    if (docSnap.exists()) {
+      const p = docSnap.data();
+      document.getElementById('edit-p-id').value = idDokumen;
+      document.getElementById('edit-p-judul').value = p.judul;
+      document.getElementById('edit-p-isi').value = p.isi;
+      document.getElementById('modal-edit-pengumuman').classList.add('active');
+    }
+  } catch (error) {
+    console.error("Error edit: ", error);
+  }
+}
+
+async function simpanEditPengumuman() {
+  const idDokumen = document.getElementById('edit-p-id').value;
+  const judulBaru = document.getElementById('edit-p-judul').value.trim();
+  const isiBaru = document.getElementById('edit-p-isi').value.trim();
+
+  if (!judulBaru || !isiBaru) return alert('Judul dan Isi tidak boleh kosong!');
+
+  try {
+    const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    await updateDoc(window.fbDoc(window.firebaseDB, "pengumuman", idDokumen), {
+      judul: judulBaru,
+      isi: isiBaru
+    });
+    showToast('Pengumuman berhasil diupdate!');
+    closeModal('modal-edit-pengumuman');
+  } catch (error) {
+    console.error("Error update: ", error);
+    alert("Gagal mengupdate pengumuman.");
   }
 }
