@@ -234,7 +234,7 @@ async function simpanWarga() {
       nama: nama, nik: nik, noKK: noKK, jk: jk, pekerjaan: pekerjaan, alamat: alamat, status: status
     });
     
-    alert('Data warga berhasil ditambahkan!');
+    showToast('Data warga berhasil ditambahkan!');
     closeModal('modal-warga');
     document.getElementById('w-nama').value = '';
     document.getElementById('w-nik').value = '';
@@ -389,7 +389,7 @@ async function simpanKK() {
 
   try {
     await window.fbAddDoc(window.fbCollection(window.firebaseDB, "kk"), { nomor, kepala, jumlah, alamat });
-    alert('Data KK berhasil ditambahkan!');
+    showToast('Data KK berhasil ditambahkan!');
     closeModal('modal-kk');
     document.getElementById('kk-nomor').value = ''; document.getElementById('kk-kepala').value = ''; document.getElementById('kk-jumlah').value = ''; document.getElementById('kk-alamat').value = '';
   } catch (error) { console.error("Error simpan KK: ", error); alert('Gagal menyimpan data KK. Periksa koneksi internet.'); }
@@ -576,7 +576,7 @@ async function simpanPengumuman() {
   
   try {
     await window.fbAddDoc(window.fbCollection(window.firebaseDB, "pengumuman"), { judul, isi, tanggal });
-    alert('Pengumuman berhasil ditambahkan!');
+    showToast('Pengumuman berhasil ditambahkan!');
     closeModal('modal-pengumuman');
     document.getElementById('p-judul').value = '';
     document.getElementById('p-isi').value = '';
@@ -652,7 +652,7 @@ async function simpanSuratBaru() {
     await window.fbAddDoc(window.fbCollection(window.firebaseDB, "surat"), { 
       nama, nik, kk, ttl, jk, perkawinan, agama, pekerjaan, alamat, keperluan, tanggal: tgl, status: 'Menunggu' 
     });
-    alert('Surat berhasil dikirim ke sistem RT!'); 
+    showToast('Surat berhasil dikirim ke sistem RT!');
     batalTambahSurat();
   } catch (error) { 
     console.error("Error: ", error); 
@@ -939,7 +939,7 @@ async function simpanPengaduan() {
     await window.fbAddDoc(window.fbCollection(window.firebaseDB, "pengaduan"), {
       judul, kategori, deskripsi, pelapor, tanggal, status: 'Menunggu', tanggapan: '-'
     });
-    alert('Pengaduan berhasil dikirim!');
+    showToast('Pengaduan berhasil dikirim!');
     closeModal('modal-pengaduan');
     document.getElementById('ad-judul').value = '';
     document.getElementById('ad-deskripsi').value = '';
@@ -1052,5 +1052,43 @@ async function hapusPengaduan(idDokumen) {
       console.error("Error hapus pengaduan: ", error);
       alert("Gagal menghapus pengaduan.");
     }
+  }
+}
+// =======================================================
+// FUNGSI NOTIFIKASI TOAST (PENGGANTI ALERT)
+// =======================================================
+function showToast(message) {
+  const toast = document.getElementById("toast-notification");
+  const toastMsg = document.getElementById("toast-message");
+  
+  if(toast && toastMsg) {
+    toastMsg.innerText = message;
+    toast.classList.add("show");
+    
+    // Hilangkan notifikasi setelah 3 detik
+    setTimeout(function(){ 
+      toast.classList.remove("show"); 
+    }, 3000);
+  } else {
+    // Jika elemen toast tidak ada, gunakan alert biasa sebagai cadangan
+    alert(message);
+  }
+}
+async function updateStatusSurat(idDokumen, statusBaru) {
+  try {
+    const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    const docRef = window.fbDoc(window.firebaseDB, "surat", idDokumen);
+    
+    // Update status di database
+    await updateDoc(docRef, {
+      status: statusBaru
+    });
+    
+    // Tampilkan notifikasi Toast
+    showToast(`Surat berhasil di${statusBaru === 'Disetujui' ? 'setujui' : 'tolak'}!`);
+    
+  } catch (error) {
+    console.error("Error update status: ", error);
+    alert("Gagal memproses surat.");
   }
 }
