@@ -156,17 +156,23 @@ function showDashboard() {
     sidebarMenus.forEach(menu => menu.style.display = 'flex');
   }
 
-  renderWarga(); renderKK(); renderIuran(); renderPengumuman(); renderCharts(); renderHomeSurat();
+  renderWarga(); renderKK(); renderIuran(); renderPengumuman(); renderPengaduan(); renderCharts(); renderHomeSurat();
   
   const homeMenu = document.querySelector('[data-page="home"]');
   if(homeMenu) homeMenu.click();
 }
-  // Paksa tampilkan halaman pengaduan saat menu diklik
-  const menuPengaduan = document.querySelector('[data-page="pengaduan"]');
-  if(menuPengaduan) {
-    menuPengaduan.addEventListener('click', () => {
+  // ==========================================
+  // KODE PAKSA BUKA PENGADUAN DILETAKKAN DI SINI
+  // (Di dalam showDashboard, di paling bawah sebelum tutup })
+  // ==========================================
+  const menuAd = document.querySelector('[data-page="pengaduan"]');
+  if(menuAd) {
+    menuAd.addEventListener('click', () => {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('pengaduan').classList.add('active');
+      
+      const titleEl = document.getElementById('page-title');
+      if(titleEl) titleEl.textContent = 'Pengaduan Warga';
     });
   }
 // =======================================================
@@ -1091,10 +1097,54 @@ async function simpanPengaduan() {
 
 function renderPengaduan() {
   const tbody = document.querySelector('#table-pengaduan tbody');
-  if(!tbody) return; 
-  
-  // Hanya menampilkan teks dummy untuk tes
-  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: green; font-weight: bold;">TES: Halaman Pengaduan Berhasil Dimuat!</td></tr>';
+  if(!tbody) return; // Pengaman jika tabel tidak ada
+
+  const namaUserAktif = sessionStorage.getItem('namaUser') || '';
+  const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
+  const isAdmin = adminPenuh.includes(namaUserAktif);
+
+  window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengaduan"), (snapshot) => {
+    tbody.innerHTML = '';
+    let index = 1;
+
+    if (snapshot.empty) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Belum ada pengaduan.</td></tr>';
+      return;
+    }
+
+    snapshot.forEach((doc) => {
+      const d = doc.data();
+      
+      // Filter untuk Warga
+      if (!isAdmin && d.pelapor !== namaUserAktif) return;
+
+      let badgeClass = 'badge-warning';
+      if (d.status === 'Diproses') badgeClass = 'badge-primary';
+      if (d.status === 'Selesai') badgeClass = 'badge-success';
+
+      let tombolAksi = '';
+      if (isAdmin) {
+        tombolAksi = `
+          <button class="btn-secondary" onclick="bukaTanggapi('${doc.id}')" style="margin-right: 5px; background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Tanggapi"><i class="fas fa-reply"></i></button>
+          <button class="btn-secondary" onclick="hapusPengaduan('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
+        `;
+      } else {
+        tombolAksi = `
+          <button class="btn-secondary" onclick="lihatDetailPengaduan('${doc.id}')" style="background: #64748b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Lihat Detail"><i class="fas fa-eye"></i></button>
+        `;
+      }
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${index++}</td>
+          <td>${d.tanggal || '-'}</td>
+          <td>${d.judul || '-'}<br><small style="color:#64748b">Kategori: ${d.kategori || '-'}</small></td>
+          <td>${d.pelapor || '-'}</td>
+          <td><span class="badge ${badgeClass}">${d.status || 'Menunggu'}</span></td>
+          <td>${tombolAksi}</td>
+        </tr>`;
+    });
+  });
 }
 
 async function bukaTanggapi(idDokumen) {
