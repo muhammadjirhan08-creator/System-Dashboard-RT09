@@ -1444,3 +1444,33 @@ async function simpanEditPengumuman() {
     alert("Gagal mengupdate pengumuman.");
   }
 }
+// =======================================================
+// FUNGSI LOADING & TOAST
+// =======================================================
+function showLoading() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+
+function hideLoading() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+// Pastikan fungsi showToast juga ada
+function showToast(message) {
+  const toast = document.getElementById('toast-notification');
+  const toastMsg = document.getElementById('toast-message');
+  
+  if(toast && toastMsg) {
+    toastMsg.innerText = message;
+    toast.classList.add("show");
+    
+    // Hilangkan notifikasi setelah 3 detik
+    setTimeout(function(){ 
+      toast.classList.remove("show"); 
+    }, 3000);
+  } else {
+    alert(message);
+  }
+}
