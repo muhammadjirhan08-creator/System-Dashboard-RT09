@@ -250,19 +250,27 @@ async function simpanWarga() {
   
   if (!nama || !nik || !alamat) return alert('Lengkapi data wajib (Nama, NIK, dan Alamat)!');
 
+  showLoading(); // <--- TAMBAHKAN INI
+
   try {
     await window.fbAddDoc(window.fbCollection(window.firebaseDB, "warga"), {
       nama: nama, nik: nik, noKK: noKK, jk: jk, pekerjaan: pekerjaan, alamat: alamat, status: status
     });
     
+    hideLoading(); // <--- TAMBAHKAN INI
     showToast('Data warga berhasil ditambahkan!');
     closeModal('modal-warga');
+    
     document.getElementById('w-nama').value = '';
     document.getElementById('w-nik').value = '';
     document.getElementById('w-kk').value = ''; 
     document.getElementById('w-pekerjaan').value = '';
     document.getElementById('w-alamat').value = '';
-  } catch (error) { console.error("Error: ", error); alert('Gagal menyimpan data.'); }
+  } catch (error) { 
+    hideLoading(); // <--- TAMBAHKAN INI
+    console.error("Error: ", error); 
+    alert('Gagal menyimpan data.'); 
+  }
 }
 
 async function lihatWarga(idDokumen) {
@@ -504,6 +512,8 @@ async function simpanIuran() {
   
   if (!nama || !bulan || !jumlah) return alert('Lengkapi data iuran!');
 
+  showLoading(); // Tampilkan Loading
+
   try {
     await window.fbAddDoc(window.fbCollection(window.firebaseDB, "iuran"), {
       nama: nama,
@@ -512,12 +522,14 @@ async function simpanIuran() {
       status: 'Lunas'
     });
     
-    showToast('Data iuran berhasil dicatat!');
+    hideLoading(); // Sembunyikan Loading
+    showToast('Data iuran berhasil dicatat!'); // Tampilkan Toast
     closeModal('modal-iuran');
     document.getElementById('i-nama').value = '';
     document.getElementById('i-bulan').value = '';
     document.getElementById('i-jumlah').value = '';
   } catch (error) {
+    hideLoading(); // Sembunyikan Loading jika Error
     console.error("Error simpan iuran: ", error);
     alert('Gagal menyimpan data iuran.');
   }
@@ -653,6 +665,9 @@ async function simpanPengumuman() {
 
   if (!judul || !isi) return alert('Judul dan Isi Pengumuman tidak boleh kosong!');
 
+  // 1. TAMPILKAN LOADING DI SINI
+  showLoading(); 
+
   const tanggal = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
   let imageUrl = '';
 
@@ -660,10 +675,8 @@ async function simpanPengumuman() {
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
-      // PASTIKAN TIDAK ADA SPASI ATAU KARAKTER ANEH
       formData.append('upload_preset', 'system_dashboard_rt09'); 
 
-      // Gunakan URL yang benar tanpa spasi
       const response = await fetch('https://api.cloudinary.com/v1_1/chmayjcr/image/upload', {
         method: 'POST',
         body: formData
@@ -671,9 +684,9 @@ async function simpanPengumuman() {
       
       const data = await response.json();
       
-      // CEK ERROR DENGAN LEBIH DETAIL
       if (!data.secure_url) {
         console.error("Cloudinary Error Detail:", data);
+        hideLoading(); // Sembunyikan loading jika gambar gagal
         if (data.error && data.error.message) {
           return alert("Cloudinary Error: " + data.error.message);
         }
@@ -690,13 +703,17 @@ async function simpanPengumuman() {
       gambar: imageUrl || '' 
     });
     
-    showToast('Pengumuman berhasil ditambahkan!');
+    // 2. SEMBUNYIKAN LOADING & TAMPILKAN TOAST JIKA BERHASIL
+    hideLoading(); 
+    showToast('Pengumuman berhasil ditambahkan!'); 
     closeModal('modal-pengumuman');
     
     document.getElementById('p-judul').value = '';
     document.getElementById('p-isi').value = '';
     fileInput.value = '';
   } catch (error) {
+    // 3. SEMBUNYIKAN LOADING JIKA TERJADI ERROR
+    hideLoading(); 
     console.error("Error simpan pengumuman: ", error);
     alert('Gagal menyimpan pengumuman. Periksa koneksi internet.');
   }
@@ -743,6 +760,7 @@ function batalTambahSurat() {
 }
 
 async function simpanSuratBaru() {
+  const nomorSurat = document.getElementById('s-nomor-surat').value.trim();
   const nama = document.getElementById('s-nama').value.trim();
   const nik = document.getElementById('s-nik').value.trim();
   const kk = document.getElementById('s-kk').value.trim();
@@ -754,15 +772,13 @@ async function simpanSuratBaru() {
   const alamat = document.getElementById('s-alamat').value.trim();
   const keperluan = document.getElementById('s-keperluan').value.trim();
   
-  // TAMBAHKAN BARIS INI UNTUK MENGAMBIL NOMOR SURAT
-  const nomorSurat = document.getElementById('s-nomor-surat').value.trim(); 
-
   if(!nama || !nik || !keperluan) return alert('Mohon lengkapi Nama, NIK, dan Keperluan!');
   
   const tgl = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
-  
+
+  showLoading(); // Tampilkan Loading
+
   try {
-    // TAMBAHKAN nomorSurat DI DALAM KURUNG KURAWAL INI
     await window.fbAddDoc(window.fbCollection(window.firebaseDB, "surat"), { 
       nomorSurat: nomorSurat, 
       nama: nama, 
@@ -779,9 +795,11 @@ async function simpanSuratBaru() {
       status: 'Menunggu' 
     });
     
-    showToast('Surat berhasil dikirim ke sistem RT!');
+    hideLoading(); // Sembunyikan Loading
+    showToast('Surat berhasil dikirim ke sistem RT!'); // Tampilkan Toast
     batalTambahSurat();
   } catch (error) { 
+    hideLoading(); // Sembunyikan Loading jika Error
     console.error("Error: ", error); 
     alert('Gagal menyimpan data.'); 
   }
@@ -1141,15 +1159,23 @@ async function simpanPengaduan() {
 
   const tanggal = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
 
+  showLoading(); // Tampilkan Loading
+
   try {
     await window.fbAddDoc(window.fbCollection(window.firebaseDB, "pengaduan"), {
       judul, kategori, deskripsi, pelapor, tanggal, status: 'Menunggu', tanggapan: '-'
     });
-    showToast('Pengaduan berhasil dikirim!');
+    
+    hideLoading(); // Sembunyikan Loading
+    showToast('Pengaduan berhasil dikirim!'); // Tampilkan Toast
     closeModal('modal-pengaduan');
     document.getElementById('ad-judul').value = '';
     document.getElementById('ad-deskripsi').value = '';
-  } catch (error) { console.error("Error: ", error); alert('Gagal mengirim pengaduan.'); }
+  } catch (error) { 
+    hideLoading(); // Sembunyikan Loading jika Error
+    console.error("Error: ", error); 
+    alert('Gagal mengirim pengaduan.'); 
+  }
 }
 
 function renderPengaduan() {
@@ -1293,15 +1319,23 @@ async function simpanTanggapan() {
   const statusBaru = document.getElementById('tanggapi-status').value;
   const pesan = document.getElementById('tanggapi-pesan').value.trim();
 
+  showLoading(); // Tampilkan Loading
+
   try {
     const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
     await updateDoc(window.fbDoc(window.firebaseDB, "pengaduan", idDokumen), {
       status: statusBaru,
       tanggapan: pesan || '-'
     });
-    alert('Tanggapan berhasil dikirim!');
+    
+    hideLoading(); // Sembunyikan Loading
+    showToast('Tanggapan berhasil dikirim!'); // Tampilkan Toast
     closeModal('modal-tanggapi');
-  } catch (error) { console.error("Error: ", error); alert('Gagal mengirim tanggapan.'); }
+  } catch (error) { 
+    hideLoading(); // Sembunyikan Loading jika Error
+    console.error("Error: ", error); 
+    alert('Gagal mengirim tanggapan.'); 
+  }
 }
 
 async function lihatDetailPengaduan(idDokumen) {

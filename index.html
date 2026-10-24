@@ -209,7 +209,7 @@
             </div>
           </div>
 
-          <!-- KOTAK PENGADUAN WARGA (LINK GOOGLE FORM) -->
+            <!-- KOTAK PENGADUAN WARGA (LINK GOOGLE FORM) -->
           <div class="home-section" style="margin-top: 20px;">
             <h3 class="section-title"><i class="fas fa-exclamation-circle" style="color: #ef4444;"></i> Layanan Pengaduan Warga</h3>
             
@@ -767,3 +767,17 @@
   <script src="script.js"></script>
 </body>
 </html>
+  <!-- ================= OVERLAY LOADING (SAVING) ================= -->
+  <div id="loading-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 99999; justify-content: center; align-items: center;">
+    <div style="background: #fff; padding: 30px 50px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center;">
+      <h4 style="margin-bottom: 15px; color: #1e293b; font-size: 16px;">Saving...</h4>
+      <!-- Animasi Spinner -->
+      <div style="width: 30px; height: 30px; border: 4px solid #e2e8f0; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+    </div>
+  </div>
+
+  <!-- ================= NOTIFIKASI TOAST (HIJAU) ================= -->
+  <div id="toast-notification" style="visibility: hidden; min-width: 250px; background-color: #10b981; color: #fff; text-align: left; border-radius: 8px; padding: 16px 20px; position: fixed; z-index: 99999; right: 20px; top: 20px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transform: translateY(-20px); transition: opacity 0.3s, transform 0.3s, visibility 0.3s;">
+    <i class="fas fa-check-circle" style="font-size: 18px;"></i>
+    <span id="toast-message">Data Success to Saved</span>
+  </div>

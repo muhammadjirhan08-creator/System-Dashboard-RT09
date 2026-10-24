@@ -936,3 +936,15 @@ button.btn-login:hover {
   opacity: 1;
   transform: translateY(0);
 }
+/* Animasi Spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Class untuk menampilkan Toast */
+#toast-notification.show {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
