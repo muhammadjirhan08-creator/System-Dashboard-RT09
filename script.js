@@ -659,7 +659,7 @@ async function simpanPengumuman() {
       formData.append('upload_preset', 'system_dashboard_rt09'); 
 
       // Gunakan URL yang benar tanpa spasi
-      const response = await fetch('https://api.cloudinary.com/v1_1/chmaylor/image/upload', {
+      const response = await fetch('https://api.cloudinary.com/v1_1/chmayjcr/image/upload', {
         method: 'POST',
         body: formData
       });
