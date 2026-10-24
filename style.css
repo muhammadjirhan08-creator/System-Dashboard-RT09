@@ -897,3 +897,11 @@ button.btn-login:hover {
   background-color: #fff;
   color: #1e293b;
 }
+@media print {
+  body {
+    padding: 10px 40px !important; /* Memaksa margin atas jadi kecil saat print */
+  }
+  .kop-surat {
+    margin-top: -10px !important; /* Menaikkan kop surat */
+  }
+}
