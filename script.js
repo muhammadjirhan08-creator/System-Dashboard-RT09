@@ -655,10 +655,10 @@ async function simpanPengumuman() {
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
-      // Pastikan nama preset SAMA PERSIS (tanpa spasi tambahan)
+      // PASTIKAN TIDAK ADA SPASI ATAU KARAKTER ANEH
       formData.append('upload_preset', 'system_dashboard_rt09'); 
 
-      // Pastikan Cloud Name Anda benar (chmaylor)
+      // Gunakan URL yang benar tanpa spasi
       const response = await fetch('https://api.cloudinary.com/v1_1/chmaylor/image/upload', {
         method: 'POST',
         body: formData
@@ -666,16 +666,18 @@ async function simpanPengumuman() {
       
       const data = await response.json();
       
-      // CEK JIKA UPLOAD GAGAL
+      // CEK ERROR DENGAN LEBIH DETAIL
       if (!data.secure_url) {
-        console.error("Cloudinary Error:", data);
-        return alert("Gagal upload gambar: " + (data.error?.message || "Periksa konfigurasi Cloudinary"));
+        console.error("Cloudinary Error Detail:", data);
+        if (data.error && data.error.message) {
+          return alert("Cloudinary Error: " + data.error.message);
+        }
+        return alert("Gagal upload gambar. Cek Console untuk detail.");
       }
       
       imageUrl = data.secure_url;
     }
 
-    // Simpan ke Firebase (Gunakan imageUrl || '' agar tidak undefined)
     await window.fbAddDoc(window.fbCollection(window.firebaseDB, "pengumuman"), {
       judul: judul,
       isi: isi,
