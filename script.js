@@ -494,6 +494,8 @@ function renderPengumuman() {
         const pesanWA = encodeURIComponent(`*PENGUMUMAN RT 09 KARANG REJO*\n\n*Judul:* ${p.judul}\n*Tanggal:* ${p.tanggal}\n\n${p.isi}\n\n_— Sistem Informasi RT 09_`);
         const linkWA = `https://wa.me/?text=${pesanWA}`;
 
+         // TOMBOL WA HANYA MUNCUL JIKA ADMIN
+
         list.innerHTML += `
           <div class="pengumuman-item" style="position: relative;">
             <h4>${p.judul}</h4>
@@ -501,12 +503,9 @@ function renderPengumuman() {
             <small>📅 ${p.tanggal}</small>
             
             <div style="position: absolute; top: 15px; right: 15px; display: flex; gap: 5px;">
-              <a href="${linkWA}" target="_blank" class="btn-secondary" style="background: #25D366; color: white; border: none; padding: 5px 10px; border-radius: 5px; text-decoration: none;" title="Bagikan ke WhatsApp">
-                <i class="fab fa-whatsapp"></i>
-              </a>
-              <button class="btn-secondary" onclick="hapusPengumuman('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus">
-                <i class="fas fa-trash"></i>
-              </button>
+              ${tombolWA} <!-- Hanya muncul jika Admin -->
+              
+              ${isAdmin ? `<button class="btn-secondary" onclick="hapusPengumuman('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>` : ''}
             </div>
           </div>`;
       });
@@ -529,7 +528,7 @@ function renderPengumuman() {
       snapshot.forEach((doc) => {
         if (count < 3) {
           const p = doc.data();
-          homeList.innerHTML += `
+               homeList.innerHTML += `
             <div class="list-item" style="position: relative;">
               <div class="list-icon green"><i class="fas fa-bullhorn"></i></div>
               <div class="list-content">
@@ -537,9 +536,7 @@ function renderPengumuman() {
                 <p>${p.isi}</p>
                 <small>📅 ${p.tanggal}</small>
               </div>
-              <a href="https://wa.me/?text=${encodeURIComponent(`*PENGUMUMAN RT 09*\n\n*${p.judul}*\n${p.isi}\n\n_— RT 09 Karang Rejo_`)}" target="_blank" style="position: absolute; top: 15px; right: 15px; color: #25D366; font-size: 20px;" title="Bagikan ke WhatsApp">
-                <i class="fab fa-whatsapp"></i>
-              </a>
+              ${tombolWAHome} <!-- Hanya muncul jika Admin -->
             </div>`;
           count++;
         }
@@ -635,15 +632,15 @@ function renderSurat() {
     if (snapshot.empty) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b;">Belum ada data surat.</td></tr>'; return; }
     const namaUserAktif = sessionStorage.getItem('namaUser') || '';
     const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
-    const isAdmin = adminPenuh.includes(namaUserAktif);
+    const isAdminHome = adminPenuhHome.includes(namaUserAktifHome);
     let index = 1;
     snapshot.forEach((doc) => {
-      const s = doc.data();
+        const p = doc.data();
       let tombolAksi = `<button class="btn-secondary" onclick="downloadSuratPDF('${doc.id}')" style="margin-right: 5px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Download PDF"><i class="fas fa-download"></i></button><button class="btn-secondary" onclick="printSuratDariFirebase('${doc.id}')" style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Print"><i class="fas fa-print"></i></button>`;
       if (isAdmin) {
         tombolAksi += `<button class="btn-secondary" onclick="updateStatusSurat('${doc.id}', 'Disetujui')" style="margin-left: 5px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Setujui"><i class="fas fa-check"></i></button><button class="btn-secondary" onclick="updateStatusSurat('${doc.id}', 'Ditolak')" style="margin-left: 5px; background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Tolak"><i class="fas fa-times"></i></button><button class="btn-secondary" onclick="hapusSuratDariList('${doc.id}')" style="margin-left: 5px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>`;
       }
-      tbody.innerHTML += `<tr><td>${index++}</td><td>${s.tanggal}</td><td>${s.nama}</td><td>${s.nik}</td><td>${s.keperluan}</td><td style="white-space: nowrap;">${tombolAksi}</td></tr>`;
+      tbody.innerHTML += `<tr><td>${index++}</td><td>${p.tanggal}</td><td>${p.nama}</td><td>${p.nik}</td><td>${p.keperluan}</td><td style="white-space: nowrap;">${tombolAksi}</td></tr>`;
     });
   });
 }
