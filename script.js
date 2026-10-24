@@ -434,43 +434,89 @@ async function hapusKK(idDokumen) {
 }
 
 // =======================================================
-// 9. DATA IURAN
+// 9. DATA IURAN (FIREBASE)
 // =======================================================
 function renderIuran() {
   const tbody = document.querySelector('#table-iuran tbody');
   if (!tbody) return;
-  tbody.innerHTML = '';
-  let total = 0, belum = 0;
-  
-  dataIuran.forEach((d, i) => {
-    if (d.status === 'Lunas') total += Number(d.jumlah);
-    else belum++;
-    tbody.innerHTML += `
-      <tr>
-        <td>${i + 1}</td><td>${d.nama}</td><td>${d.bulan}</td><td>Rp ${Number(d.jumlah).toLocaleString('id-ID')}</td>
-        <td><span class="badge ${d.status === 'Lunas' ? 'badge-success' : 'badge-danger'}">${d.status}</span></td>
-        <td><button class="btn-secondary" onclick="hapusIuran(${i})" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;"><i class="fas fa-trash"></i></button></td>
-      </tr>`;
+
+  window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "iuran"), (snapshot) => {
+    tbody.innerHTML = '';
+    dataIuran = [];
+    let total = 0, belum = 0;
+
+    if (snapshot.empty) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b;">Belum ada data iuran.</td></tr>';
+      document.getElementById('total-iuran').textContent = '0';
+      document.getElementById('belum-bayar').textContent = '0';
+      return;
+    }
+
+    let index = 1;
+    snapshot.forEach((doc) => {
+      const d = doc.data();
+      d.id = doc.id;
+      dataIuran.push(d);
+
+      if (d.status === 'Lunas') total += Number(d.jumlah);
+      else belum++;
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${index++}</td>
+          <td>${d.nama || '-'}</td>
+          <td>${d.bulan || '-'}</td>
+          <td>Rp ${Number(d.jumlah).toLocaleString('id-ID')}</td>
+          <td><span class="badge ${d.status === 'Lunas' ? 'badge-success' : 'badge-danger'}">${d.status || '-'}</span></td>
+          <td>
+            <button class="btn-secondary" onclick="hapusIuran('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>`;
+    });
+
+    document.getElementById('total-iuran').textContent = total.toLocaleString('id-ID');
+    document.getElementById('belum-bayar').textContent = belum;
+    document.getElementById('lap-pemasukan').textContent = total.toLocaleString('id-ID');
+    document.getElementById('lap-pengeluaran').textContent = '0';
+    document.getElementById('lap-saldo').textContent = total.toLocaleString('id-ID');
   });
-  document.getElementById('total-iuran').textContent = total.toLocaleString('id-ID');
-  document.getElementById('belum-bayar').textContent = belum;
-  document.getElementById('lap-pemasukan').textContent = total.toLocaleString('id-ID');
-  document.getElementById('lap-pengeluaran').textContent = '0';
-  document.getElementById('lap-saldo').textContent = total.toLocaleString('id-ID');
 }
 
-function simpanIuran() {
+async function simpanIuran() {
   const nama = document.getElementById('i-nama').value.trim();
   const bulan = document.getElementById('i-bulan').value.trim();
   const jumlah = document.getElementById('i-jumlah').value;
-  if (!nama || !bulan || !jumlah) return alert('Lengkapi data!');
-  dataIuran.push({ nama, bulan, jumlah, status: 'Lunas' });
-  renderIuran(); closeModal('modal-iuran');
-  document.getElementById('i-nama').value = ''; document.getElementById('i-bulan').value = ''; document.getElementById('i-jumlah').value = '';
+  
+  if (!nama || !bulan || !jumlah) return alert('Lengkapi data iuran!');
+
+  try {
+    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "iuran"), {
+      nama: nama,
+      bulan: bulan,
+      jumlah: Number(jumlah),
+      status: 'Lunas'
+    });
+    
+    showToast('Data iuran berhasil dicatat!');
+    closeModal('modal-iuran');
+    document.getElementById('i-nama').value = '';
+    document.getElementById('i-bulan').value = '';
+    document.getElementById('i-jumlah').value = '';
+  } catch (error) {
+    console.error("Error simpan iuran: ", error);
+    alert('Gagal menyimpan data iuran.');
+  }
 }
 
-function hapusIuran(index) {
-  if (confirm('Hapus data iuran ini?')) { dataIuran.splice(index, 1); renderIuran(); }
+async function hapusIuran(idDokumen) {
+  if (confirm('Hapus data iuran ini?')) {
+    try {
+      await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "iuran", idDokumen));
+      showToast('Data iuran berhasil dihapus!');
+    } catch (error) {
+      console.error("Error hapus iuran: ", error);
+    }
+  }
 }
 
 // =======================================================
@@ -736,26 +782,32 @@ function printSurat() {
   
   printWindow.document.write('<html><head><title>Cetak Surat</title>');
   
-  // KODE CSS YANG RAPI (Menggunakan backtick ` ` )
+  // KODE CSS YANG MENYEMBUNYIKAN SEMUA ELEMEN WEB
   printWindow.document.write(`
     <style>
-      @page { 
-        size: A4 portrait; 
-        margin: 15mm; /* Margin kertas 1.5cm agar aman */
+      /* Sembunyikan semua elemen di luar surat */
+      body * {
+        visibility: hidden;
       }
-      body { 
-        font-family: 'Times New Roman', serif !important; 
-        font-size: 13px; 
-        line-height: 1.3; 
-        background: #fff !important; 
-        color: #000 !important; 
-        margin: 0;
-        padding: 0;
+      
+      /* Tampilkan HANYA bagian isi surat */
+      #isi-surat, #isi-surat * {
+        visibility: visible;
       }
-      #isi-surat { 
-        display: block !important; 
-        visibility: visible !important; 
+      
+      /* Atur posisi surat agar pas di kertas A4 */
+      #isi-surat {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        font-family: 'Times New Roman', serif !important;
+        font-size: 14px;
+        color: #000 !important;
+        background: #fff !important;
       }
+
+      /* Atur Kop Surat */
       .kop-surat { 
         display: flex !important; 
         align-items: center; 
@@ -767,10 +819,14 @@ function printSurat() {
       .kop-text h3 { font-size: 16px; margin: 0; color: #000; }
       .kop-text h2 { font-size: 20px; margin: 2px 0; color: #000; }
       .kop-text p { font-size: 12px; margin: 0; color: #000; }
+      
       hr { border: 1.5px solid #000 !important; margin-bottom: 15px; }
+      
       p { margin-bottom: 8px !important; }
-      .tabel-surat { width: 100%; font-size: 13px; margin-left: 20px; color: #000; }
+      
+      .tabel-surat { width: 100%; font-size: 14px; margin-left: 20px; color: #000; }
       .tabel-surat td { padding: 2px 0; }
+      
       .ttd-area { 
         display: flex !important; 
         justify-content: space-between; 
@@ -778,7 +834,11 @@ function printSurat() {
         text-align: left; 
         color: #000; 
       }
-      * { page-break-inside: avoid; }
+      
+      /* Mencegah elemen terpotong ke halaman 2 */
+      * { 
+        page-break-inside: avoid; 
+      }
     </style>
   `);
   
