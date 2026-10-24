@@ -161,7 +161,14 @@ function showDashboard() {
   const homeMenu = document.querySelector('[data-page="home"]');
   if(homeMenu) homeMenu.click();
 }
-
+  // Paksa tampilkan halaman pengaduan saat menu diklik
+  const menuPengaduan = document.querySelector('[data-page="pengaduan"]');
+  if(menuPengaduan) {
+    menuPengaduan.addEventListener('click', () => {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('pengaduan').classList.add('active');
+    });
+  }
 // =======================================================
 // 5. FUNGSI MODAL
 // =======================================================
