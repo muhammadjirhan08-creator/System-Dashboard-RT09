@@ -877,15 +877,23 @@ function renderPengaduan() {
       if (!isAdmin && d.pelapor !== namaUserAktif) return;
 
       let badgeClass = 'badge-warning'; // Kuning untuk Menunggu
-      if (d.status === 'Diproses') badgeClass = 'badge-primary'; // Biru (tambahkan CSS jika belum ada)
+      if (d.status === 'Diproses') badgeClass = 'badge-primary'; // Biru
       if (d.status === 'Selesai') badgeClass = 'badge-success'; // Hijau
 
-      // Tombol aksi
+      // Tombol aksi (Admin vs Warga)
       let tombolAksi = '';
+      
       if (isAdmin) {
-        tombolAksi = `<button class="btn-secondary" onclick="bukaTanggapi('${doc.id}')" style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Tanggapi"><i class="fas fa-reply"></i></button>`;
+        // Jika Admin: Tampilkan tombol Tanggapi dan Hapus
+        tombolAksi = `
+          <button class="btn-secondary" onclick="bukaTanggapi('${doc.id}')" style="margin-right: 5px; background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Tanggapi"><i class="fas fa-reply"></i></button>
+          <button class="btn-secondary" onclick="hapusPengaduan('${doc.id}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Hapus"><i class="fas fa-trash"></i></button>
+        `;
       } else {
-        tombolAksi = `<button class="btn-secondary" onclick="lihatDetailPengaduan('${doc.id}')" style="background: #64748b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Lihat Detail"><i class="fas fa-eye"></i></button>`;
+        // Jika Warga: Hanya tampilkan tombol Lihat Detail
+        tombolAksi = `
+          <button class="btn-secondary" onclick="lihatDetailPengaduan('${doc.id}')" style="background: #64748b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Lihat Detail"><i class="fas fa-eye"></i></button>
+        `;
       }
 
       tbody.innerHTML += `
@@ -941,4 +949,15 @@ async function lihatDetailPengaduan(idDokumen) {
       alert(`Judul: ${d.judul}\nStatus: ${d.status}\n\nDeskripsi:\n${d.deskripsi}\n\nTanggapan Admin:\n${d.tanggapan}`);
     }
   } catch (error) { console.error("Error: ", error); }
+}
+async function hapusPengaduan(idDokumen) {
+  if (confirm('Apakah Anda yakin ingin menghapus pengaduan ini?')) {
+    try {
+      await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "pengaduan", idDokumen));
+      alert('Pengaduan berhasil dihapus!');
+    } catch (error) {
+      console.error("Error hapus pengaduan: ", error);
+      alert("Gagal menghapus pengaduan.");
+    }
+  }
 }
