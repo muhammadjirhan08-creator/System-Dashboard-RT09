@@ -89,6 +89,7 @@ document.querySelectorAll('.sidebar .menu li[data-page]').forEach(item => {
     if (page === 'laporan') renderIuran();
     if (page === 'surat') renderSurat();
     if (page === 'home') renderHomeSurat();
+    if (page === 'pengaduan') renderPengaduan();
   });
 });
 
@@ -825,4 +826,119 @@ function filterWarga() {
     const nama = row.querySelector('td:nth-child(3)').innerText.toLowerCase();
     row.style.display = nama.includes(keyword) ? '' : 'none';
   });
+}
+// =======================================================
+// 14. FITUR PENGADUAN WARGA
+// =======================================================
+function openModalPengaduan() { document.getElementById('modal-pengaduan').classList.add('active'); }
+
+async function simpanPengaduan() {
+  const judul = document.getElementById('ad-judul').value.trim();
+  const kategori = document.getElementById('ad-kategori').value;
+  const deskripsi = document.getElementById('ad-deskripsi').value.trim();
+  const pelapor = sessionStorage.getItem('namaUser') || 'Warga';
+
+  if (!judul || !deskripsi) return alert('Lengkapi Judul dan Deskripsi!');
+
+  const tanggal = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  try {
+    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "pengaduan"), {
+      judul, kategori, deskripsi, pelapor, tanggal, status: 'Menunggu', tanggapan: '-'
+    });
+    alert('Pengaduan berhasil dikirim!');
+    closeModal('modal-pengaduan');
+    document.getElementById('ad-judul').value = '';
+    document.getElementById('ad-deskripsi').value = '';
+  } catch (error) { console.error("Error: ", error); alert('Gagal mengirim pengaduan.'); }
+}
+
+function renderPengaduan() {
+  const tbody = document.querySelector('#table-pengaduan tbody');
+  if(!tbody) return;
+
+  const namaUserAktif = sessionStorage.getItem('namaUser') || '';
+  const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
+  const isAdmin = adminPenuh.includes(namaUserAktif);
+
+  window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengaduan"), (snapshot) => {
+    tbody.innerHTML = '';
+    let index = 1;
+
+    if (snapshot.empty) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Belum ada pengaduan.</td></tr>';
+      return;
+    }
+
+    snapshot.forEach((doc) => {
+      const d = doc.data();
+      
+      // Jika Warga, hanya tampilkan aduan miliknya sendiri
+      if (!isAdmin && d.pelapor !== namaUserAktif) return;
+
+      let badgeClass = 'badge-warning'; // Kuning untuk Menunggu
+      if (d.status === 'Diproses') badgeClass = 'badge-primary'; // Biru (tambahkan CSS jika belum ada)
+      if (d.status === 'Selesai') badgeClass = 'badge-success'; // Hijau
+
+      // Tombol aksi
+      let tombolAksi = '';
+      if (isAdmin) {
+        tombolAksi = `<button class="btn-secondary" onclick="bukaTanggapi('${doc.id}')" style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Tanggapi"><i class="fas fa-reply"></i></button>`;
+      } else {
+        tombolAksi = `<button class="btn-secondary" onclick="lihatDetailPengaduan('${doc.id}')" style="background: #64748b; color: white; border: none; padding: 5px 10px; border-radius: 5px;" title="Lihat Detail"><i class="fas fa-eye"></i></button>`;
+      }
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${index++}</td>
+          <td>${d.tanggal}</td>
+          <td>${d.judul}<br><small style="color:#64748b">Kategori: ${d.kategori}</small></td>
+          <td>${d.pelapor}</td>
+          <td><span class="badge ${badgeClass}">${d.status}</span></td>
+          <td>${tombolAksi}</td>
+        </tr>`;
+    });
+  });
+}
+
+async function bukaTanggapi(idDokumen) {
+  try {
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    const docSnap = await getDoc(window.fbDoc(window.firebaseDB, "pengaduan", idDokumen));
+    if (docSnap.exists()) {
+      const d = docSnap.data();
+      document.getElementById('tanggapi-id').value = idDokumen;
+      document.getElementById('tanggapi-detail').innerHTML = `<strong>${d.judul}</strong><br>${d.deskripsi}<br><br><em>Tanggapan sebelumnya: ${d.tanggapan}</em>`;
+      document.getElementById('tanggapi-status').value = d.status;
+      document.getElementById('tanggapi-pesan').value = d.tanggapan === '-' ? '' : d.tanggapan;
+      document.getElementById('modal-tanggapi').classList.add('active');
+    }
+  } catch (error) { console.error("Error: ", error); }
+}
+
+async function simpanTanggapan() {
+  const idDokumen = document.getElementById('tanggapi-id').value;
+  const statusBaru = document.getElementById('tanggapi-status').value;
+  const pesan = document.getElementById('tanggapi-pesan').value.trim();
+
+  try {
+    const { updateDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    await updateDoc(window.fbDoc(window.firebaseDB, "pengaduan", idDokumen), {
+      status: statusBaru,
+      tanggapan: pesan || '-'
+    });
+    alert('Tanggapan berhasil dikirim!');
+    closeModal('modal-tanggapi');
+  } catch (error) { console.error("Error: ", error); alert('Gagal mengirim tanggapan.'); }
+}
+
+async function lihatDetailPengaduan(idDokumen) {
+  try {
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js");
+    const docSnap = await getDoc(window.fbDoc(window.firebaseDB, "pengaduan", idDokumen));
+    if (docSnap.exists()) {
+      const d = docSnap.data();
+      alert(`Judul: ${d.judul}\nStatus: ${d.status}\n\nDeskripsi:\n${d.deskripsi}\n\nTanggapan Admin:\n${d.tanggapan}`);
+    }
+  } catch (error) { console.error("Error: ", error); }
 }

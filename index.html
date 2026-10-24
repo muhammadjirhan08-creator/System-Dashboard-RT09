@@ -72,6 +72,7 @@
         <li class="menu-category">FORM & INFORMATION KEGIATAN</li>
         <li data-page="pengumuman"><i class="fas fa-bullhorn"></i> Pengumuman</li>
         <li data-page="surat"><i class="fas fa-envelope"></i> Surat Pengantar</li>
+        <li data-page="pengaduan"><i class="fas fa-exclamation-circle"></i> Pengaduan Warga</li>
       </ul>
     </aside>
 
@@ -320,6 +321,31 @@
         </div>
       </section>
 
+      <!-- ================= HALAMAN PENGADUAN ================= -->
+      <section id="pengaduan" class="page">
+        <h2 style="margin-bottom: 20px;">Pengaduan Warga</h2>
+        
+        <!-- Tombol Buat Aduan (Hanya untuk Warga) -->
+        <div id="form-pengaduan-container" style="margin-bottom: 20px;">
+          <button class="btn-primary" onclick="openModalPengaduan()"><i class="fas fa-plus"></i> Buat Pengaduan Baru</button>
+        </div>
+
+        <!-- Tabel Daftar Pengaduan -->
+        <table class="table" id="table-pengaduan">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Tanggal</th>
+              <th>Judul Laporan</th>
+              <th>Pelapor</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
       <!-- ================= HALAMAN LAPORAN ================= -->
       <section id="laporan" class="page">
         <h2 style="margin-bottom: 20px;">Laporan Keuangan</h2>
@@ -495,7 +521,50 @@
       </div>
     </div>
   </div>
+  
+  <!-- Modal Buat Pengaduan (Warga) -->
+  <div id="modal-pengaduan" class="modal">
+    <div class="modal-content">
+      <h3>Buat Pengaduan Baru</h3>
+      <label>Judul Laporan</label>
+      <input type="text" id="ad-judul" placeholder="Contoh: Lampu Jalan Mati">
+      <label>Kategori</label>
+      <select id="ad-kategori">
+        <option value="Keamanan">Keamanan</option>
+        <option value="Kebersihan">Kebersihan</option>
+        <option value="Infrastruktur">Infrastruktur</option>
+        <option value="Sosial">Sosial</option>
+        <option value="Lainnya">Lainnya</option>
+      </select>
+      <label>Deskripsi Laporan</label>
+      <textarea id="ad-deskripsi" placeholder="Jelaskan detail masalahnya..." rows="4"></textarea>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal('modal-pengaduan')">Batal</button>
+        <button class="btn-primary" onclick="simpanPengaduan()">Kirim Laporan</button>
+      </div>
+    </div>
+  </div>
 
+  <!-- Modal Tanggapi Pengaduan (Admin) -->
+  <div id="modal-tanggapi" class="modal">
+    <div class="modal-content">
+      <h3>Tanggapi Pengaduan</h3>
+      <input type="hidden" id="tanggapi-id">
+      <p id="tanggapi-detail" style="margin-bottom: 15px; font-size: 14px; color: #475569;"></p>
+      <label>Status</label>
+      <select id="tanggapi-status">
+        <option value="Menunggu">Menunggu</option>
+        <option value="Diproses">Sedang Diproses</option>
+        <option value="Selesai">Selesai</option>
+      </select>
+      <label>Tanggapan Admin</label>
+      <textarea id="tanggapi-pesan" placeholder="Berikan tanggapan atau solusi..." rows="4"></textarea>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal('modal-tanggapi')">Batal</button>
+        <button class="btn-primary" onclick="simpanTanggapan()">Simpan</button>
+      </div>
+    </div>
+  </div>
   <!-- ================= MODAL POSTER (ZOOM) ================= -->
   <div id="modal-poster" class="modal" onclick="tutupPoster()" style="z-index: 10000; background: rgba(0,0,0,0.85);">
     <div style="position: relative; max-width: 90%; max-height: 90vh; display: flex; justify-content: center; align-items: center;">

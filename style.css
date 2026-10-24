@@ -881,3 +881,7 @@ button.btn-login:hover {
 .password-container i:hover {
   color: #15803d;
 }
+.badge-primary { 
+  background: #dbeafe; 
+  color: #1e40af; 
+}
