@@ -147,7 +147,7 @@ function showDashboard() {
   const sidebarMenus = document.querySelectorAll('.sidebar .menu li');
 
   if (!adminPenuh.includes(namaUser)) {
-    const menuTerlarang = ['warga', 'kk', 'iuran', 'pengumuman'];
+        const menuTerlarang = ['warga', 'kk', 'iuran', 'pengumuman', 'pengaduan'];
     sidebarMenus.forEach(menu => {
       const pageName = menu.getAttribute('data-page');
       if (menuTerlarang.includes(pageName)) menu.style.display = 'none'; 
@@ -954,6 +954,11 @@ function renderPengaduan() {
   const namaUserAktif = sessionStorage.getItem('namaUser') || '';
   const adminPenuh = ['Muhammad Jirhan', 'Wagimin', 'Saikem', 'Sri Ubayati', 'Widodo'];
   const isAdmin = adminPenuh.includes(namaUserAktif);
+  
+  const btnContainer = document.getElementById('form-pengaduan-container');
+  if (btnContainer) {
+    btnContainer.style.display = isAdmin ? 'block' : 'none';
+  }
 
   window.fbOnSnapshot(window.fbCollection(window.firebaseDB, "pengaduan"), (snapshot) => {
     tbody.innerHTML = '';
