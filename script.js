@@ -1231,17 +1231,17 @@ function renderHomePengaduan() {
       const d = item.data;
       const id = item.id;
 
-      // Jika Warga, hanya tampilkan aduan miliknya sendiri
-      if (!isAdmin && d.pelapor !== namaUserAktif) return;
-
       let badgeClass = 'badge-warning'; // Kuning
       if (d.status === 'Diproses') badgeClass = 'badge-primary'; // Biru
       if (d.status === 'Selesai') badgeClass = 'badge-success'; // Hijau
 
-      // Tombol Tanggapi hanya untuk Admin
+      // Tombol Aksi HANYA untuk Admin
       let tombolAdmin = '';
       if (isAdmin) {
-        tombolAdmin = `<button class="btn-secondary" onclick="bukaTanggapi('${id}')" style="margin-left: 10px; background: #3b82f6; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px;"><i class="fas fa-reply"></i> Tanggapi</button>`;
+        tombolAdmin = `
+          <button class="btn-secondary" onclick="bukaTanggapi('${id}')" style="margin-left: 5px; background: #3b82f6; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px;" title="Tanggapi"><i class="fas fa-reply"></i></button>
+          <button class="btn-secondary" onclick="hapusPengaduan('${id}')" style="margin-left: 5px; background: #ef4444; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px;" title="Hapus"><i class="fas fa-trash"></i></button>
+        `;
       }
 
       homeList.innerHTML += `
@@ -1250,7 +1250,7 @@ function renderHomePengaduan() {
           <div class="list-content" style="width: 100%;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <h4 style="margin-bottom: 2px;">${d.judul}</h4>
-              ${tombolAdmin}
+              <div>${tombolAdmin}</div> <!-- Tombol Admin di sini -->
             </div>
             <p style="margin-bottom: 6px; font-size: 13px;">${d.deskripsi}</p>
             <div style="display: flex; justify-content: space-between; align-items: center;">
