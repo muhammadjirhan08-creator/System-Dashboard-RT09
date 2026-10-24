@@ -1244,15 +1244,25 @@ function renderHomePengaduan() {
         `;
       }
 
-      homeList.innerHTML += `
+            homeList.innerHTML += `
         <div class="list-item" style="align-items: flex-start;">
           <div class="list-icon red" style="background: #fee2e2; color: #ef4444;"><i class="fas fa-exclamation-circle"></i></div>
           <div class="list-content" style="width: 100%;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <h4 style="margin-bottom: 2px;">${d.judul}</h4>
-              <div>${tombolAdmin}</div> <!-- Tombol Admin di sini -->
+              <div>${tombolAdmin}</div> 
             </div>
             <p style="margin-bottom: 6px; font-size: 13px;">${d.deskripsi}</p>
+            
+            <!-- =============== TAMBAHKAN KODE TANGGAPAN DI SINI =============== -->
+            ${d.tanggapan && d.tanggapan !== '-' ? 
+              `<div style="margin-top: 5px; margin-bottom: 10px; padding: 8px; background: #f1f5f9; border-radius: 6px; border-left: 3px solid #3b82f6;">
+                <small style="color: #1e293b; display: block; margin-bottom: 2px;"><strong>Tanggapan Admin:</strong></small>
+                <small style="color: #475569;">${d.tanggapan}</small>
+              </div>` : ''
+            }
+            <!-- =============================================================== -->
+
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <small>Pelapor: <strong>${d.pelapor}</strong></small>
               <span class="badge ${badgeClass}">${d.status}</span>
