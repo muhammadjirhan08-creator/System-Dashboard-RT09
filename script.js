@@ -847,6 +847,7 @@ const menuNavigasi = [
   { id: 'iuran', nama: 'Iuran', icon: 'fa-money-bill-wave', deskripsi: 'Pembayaran Iuran' },
   { id: 'pengumuman', nama: 'Pengumuman', icon: 'fa-bullhorn', deskripsi: 'Informasi RT' },
   { id: 'surat', nama: 'Surat Pengantar', icon: 'fa-envelope', deskripsi: 'Buat & Cetak Surat' },
+  { id: 'pengaduan', nama: 'Pengaduan Warga', icon: 'fa-exclamation-circle', deskripsi: 'Layanan Aduan Warga' }, // TAMBAHKAN INI
   { id: 'laporan', nama: 'Laporan', icon: 'fa-file-alt', deskripsi: 'Laporan Keuangan' }
 ];
 
