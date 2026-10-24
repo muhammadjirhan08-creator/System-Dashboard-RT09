@@ -622,26 +622,48 @@ function renderPengumuman() {
 async function simpanPengumuman() {
   const judul = document.getElementById('p-judul').value.trim();
   const isi = document.getElementById('p-isi').value.trim();
-  
+  const fileInput = document.getElementById('p-gambar');
+  const file = fileInput.files[0];
+
   if (!judul || !isi) return alert('Judul dan Isi Pengumuman tidak boleh kosong!');
-  
+
   const tanggal = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
-  
+  let imageUrl = '';
+
   try {
-    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "pengumuman"), { judul, isi, tanggal });
+    // Proses Upload Gambar ke Cloudinary (Jika ada file)
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'system_dashboard_rt09'); // Sesuai nama preset Anda
+
+      const response = await fetch('https://api.cloudinary.com/v1_1/chmaylor/image/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      imageUrl = data.secure_url; // Mengambil link gambar dari Cloudinary
+    }
+
+    // Simpan ke Firebase Firestore (PERHATIKAN NAMA COLLECTION)
+    await window.fbAddDoc(window.fbCollection(window.firebaseDB, "pengumuman"), { // HARUS "pengumuman"
+      judul: judul,
+      isi: isi,
+      tanggal: tanggal,
+      gambar: imageUrl 
+    });
+    
     showToast('Pengumuman berhasil ditambahkan!');
     closeModal('modal-pengumuman');
+    
+    // Reset Form
     document.getElementById('p-judul').value = '';
     document.getElementById('p-isi').value = '';
-  } catch (error) { console.error("Error simpan pengumuman: ", error); alert('Gagal menyimpan pengumuman. Periksa koneksi internet.'); }
-}
-
-async function hapusPengumuman(idDokumen) {
-  if (confirm('Hapus pengumuman ini?')) {
-    try {
-      await window.fbDeleteDoc(window.fbDoc(window.firebaseDB, "pengumuman", idDokumen));
-      alert('Pengumuman berhasil dihapus!');
-    } catch (error) { console.error("Error hapus: ", error); alert("Gagal menghapus pengumuman."); }
+    fileInput.value = '';
+  } catch (error) {
+    console.error("Error simpan pengumuman: ", error);
+    alert('Gagal menyimpan pengumuman. Periksa koneksi internet.');
   }
 }
 
